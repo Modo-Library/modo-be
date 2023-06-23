@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.locationtech.jts.geom.Point;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -13,6 +16,7 @@ import org.locationtech.jts.geom.Point;
 @Table(indexes = @Index(name = "idx_nickname", columnList = "nickname"))
 public class Users {
     @Id
+    @Column
     private String usersId;
 
     @Column(nullable = false)
@@ -30,4 +34,9 @@ public class Users {
     @Column(nullable = false)
     private Long reviewCount;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    private UsersHistory usersHistory;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    private List<UsersReview> usersReviewList = new ArrayList<>();
 }

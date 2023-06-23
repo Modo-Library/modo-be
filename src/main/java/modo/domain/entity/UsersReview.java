@@ -1,8 +1,6 @@
 package modo.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @AllArgsConstructor
@@ -13,6 +11,7 @@ import lombok.*;
 @Entity
 public class UsersReview {
     @Id
+    @Column(name = "usersReviewId")
     private String usersId;
 
     @Column(nullable = false)
@@ -20,4 +19,8 @@ public class UsersReview {
 
     @Column
     private String description;
+
+    @ManyToOne
+    @JoinColumn(name = "usersId")
+    private Users users;
 }

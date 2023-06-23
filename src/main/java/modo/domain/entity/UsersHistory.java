@@ -1,8 +1,6 @@
 package modo.domain.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @AllArgsConstructor
@@ -12,6 +10,7 @@ import lombok.*;
 @Entity
 public class UsersHistory {
     @Id
+    @Column(name = "usersHistoryId")
     private String usersId;
 
     @Column(nullable = false)
@@ -25,4 +24,8 @@ public class UsersHistory {
 
     @Column(nullable = false)
     private long sellCount;
+
+    @OneToOne(mappedBy = "usersHistory")
+    @JoinColumn(name = "usersId")
+    private Users users;
 }
