@@ -2,6 +2,7 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ValueGenerationType;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -12,10 +13,11 @@ import lombok.*;
 public class UsersReview {
     @Id
     @Column(name = "usersReviewId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column
-    private String usersId;
+    private String reviewedUsers;
 
     @Column(nullable = false)
     private Long score;

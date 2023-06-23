@@ -14,7 +14,7 @@ public class EachReviewResponseDto {
 
     @Builder
     public EachReviewResponseDto(UsersReview usersReview) {
-        this.usersId = usersReview.getUsersId();
+        this.usersId = usersReview.getReviewedUsers();
         this.score = usersReview.getScore();
         this.description = usersReview.getDescription();
     }
