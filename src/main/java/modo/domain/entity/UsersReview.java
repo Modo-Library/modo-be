@@ -12,6 +12,9 @@ import lombok.*;
 public class UsersReview {
     @Id
     @Column(name = "usersReviewId")
+    private long id;
+
+    @Column
     private String usersId;
 
     @Column(nullable = false)
