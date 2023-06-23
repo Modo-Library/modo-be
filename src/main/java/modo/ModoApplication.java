@@ -7,7 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class ModoApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(ModoApplication.class, args);
+		System.out.println(org.hibernate.Version.getVersionString());
+        SpringApplication.run(ModoApplication.class, args);
 	}
 
 }
