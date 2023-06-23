@@ -1,4 +1,7 @@
 package modo.repository;
 
-public interface UsersHistoryRepository {
+import modo.domain.entity.UsersHistory;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface UsersHistoryRepository extends JpaRepository<UsersHistory, String> {
 }
