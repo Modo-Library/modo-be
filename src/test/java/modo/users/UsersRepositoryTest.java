@@ -33,6 +33,7 @@ public class UsersRepositoryTest {
                 .location(testLocation)
                 .reviewScore(testReviewScore)
                 .password(testPassword)
+                .reviewCount(testReviewCount)
                 .build();
 
         usersRepository.save(users);
@@ -46,6 +47,7 @@ public class UsersRepositoryTest {
         assertThat(target.getReviewScore()).isEqualTo(testReviewScore);
         assertThat(target.getLocation().getX()).isEqualTo(testX);
         assertThat(target.getLocation().getY()).isEqualTo(testY);
+        assertThat(target.getReviewCount()).isEqualTo(testReviewCount);
     }
 
     @Test
@@ -75,6 +77,7 @@ public class UsersRepositoryTest {
     static final double testX = 1.1;
     static final double testY = 2.2;
     static final double testReviewScore = 0.0;
+    static final Long testReviewCount = 0L;
 
 
     private void saveTestUsers() {
@@ -84,6 +87,7 @@ public class UsersRepositoryTest {
                 .location(testLocation)
                 .reviewScore(testReviewScore)
                 .password(testPassword)
+                .reviewCount(testReviewCount)
                 .build();
 
         usersRepository.save(users);

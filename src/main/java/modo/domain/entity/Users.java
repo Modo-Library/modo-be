@@ -27,4 +27,7 @@ public class Users {
     @Column(nullable = false)
     private double reviewScore;
 
+    @Column(nullable = false)
+    private Long reviewCount;
+
 }
