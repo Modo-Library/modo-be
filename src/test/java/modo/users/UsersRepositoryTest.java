@@ -11,6 +11,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
 @AutoConfigureTestDatabase
@@ -46,6 +47,12 @@ public class UsersRepositoryTest {
         assertThat(target.getLocation().getX()).isEqualTo(testX);
         assertThat(target.getLocation().getY()).isEqualTo(testY);
     }
+
+    @Test
+    void Repository_회원조회_실패_테스트() {
+        assertThrows(IllegalArgumentException.class, () -> usersRepository.findById(testUsersId).orElseThrow(() -> new IllegalArgumentException("")));
+    }
+
 
     @Test
     void Repository_아이디존재여부_테스트() {
