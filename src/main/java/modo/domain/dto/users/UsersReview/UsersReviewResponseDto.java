@@ -1,6 +1,7 @@
 package modo.domain.dto.users.UsersReview;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.Setter;
 import modo.domain.entity.Users;
 
@@ -9,6 +10,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Setter
+@Getter
 public class UsersReviewResponseDto {
     private String usersId;
     private String nickname;

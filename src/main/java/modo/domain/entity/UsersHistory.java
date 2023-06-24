@@ -7,6 +7,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 @Getter
+@Setter
 @Entity
 public class UsersHistory {
     @Id
@@ -25,7 +26,7 @@ public class UsersHistory {
     @Column(nullable = false)
     private long sellCount;
 
-    @OneToOne(mappedBy = "usersHistory")
+    @OneToOne
     @JoinColumn(name = "usersId")
     private Users users;
 }

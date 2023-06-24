@@ -34,9 +34,9 @@ public class Users {
     @Column(nullable = false)
     private Long reviewCount;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private UsersHistory usersHistory;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersReview> usersReviewList = new ArrayList<>();
 }

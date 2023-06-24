@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 
 @AllArgsConstructor
+@Builder
 public class UsersReviewSaveRequestDto {
     private String usersId;
     private Long score;

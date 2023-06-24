@@ -1,8 +1,12 @@
 package modo.domain.dto.users.Users;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import modo.domain.entity.Users;
 import modo.util.GeomUtil;
 
+@AllArgsConstructor
+@Builder
 public class UsersSaveRequestDto {
     private String usersId;
     private String password;

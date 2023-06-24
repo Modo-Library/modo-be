@@ -3,20 +3,22 @@ package modo.domain.dto.users.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import modo.domain.entity.Users;
 
+@Getter
 @AllArgsConstructor
 public class UsersResponseDto {
     // Users
-    public String usersId;
-    public String nickname;
-    public double reviewScore;
-    public Long reviewCount;
+    private String usersId;
+    private String nickname;
+    private double reviewScore;
+    private Long reviewCount;
     // UsersHistory
-    public Long rentingCount;
-    public Long returningCount;
-    public Long buyCount;
-    public Long sellCount;
+    private Long rentingCount;
+    private Long returningCount;
+    private Long buyCount;
+    private Long sellCount;
 
     @Builder
     public UsersResponseDto(Users users) {
