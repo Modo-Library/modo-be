@@ -27,7 +27,7 @@ public class UsersResponseDto {
         this.reviewScore = users.getReviewScore();
         this.reviewCount = users.getReviewCount();
         this.rentingCount = users.getUsersHistory().getRentingCount();
-        this.returningCount = users.getUsersHistory().getRentingCount();
+        this.returningCount = users.getUsersHistory().getReturningCount();
         this.buyCount = users.getUsersHistory().getBuyCount();
         this.sellCount = users.getUsersHistory().getSellCount();
     }

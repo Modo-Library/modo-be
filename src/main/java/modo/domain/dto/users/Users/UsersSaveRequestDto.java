@@ -5,6 +5,8 @@ import lombok.Builder;
 import modo.domain.entity.Users;
 import modo.util.GeomUtil;
 
+import java.util.ArrayList;
+
 @AllArgsConstructor
 @Builder
 public class UsersSaveRequestDto {
@@ -22,6 +24,7 @@ public class UsersSaveRequestDto {
                 .location(GeomUtil.createPoint(latitude, longitude))
                 .reviewScore(0.0)
                 .reviewCount(0L)
+                .usersReviewList(new ArrayList<>())
                 .build();
     }
 }

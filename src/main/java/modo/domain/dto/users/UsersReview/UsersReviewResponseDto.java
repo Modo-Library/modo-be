@@ -3,6 +3,7 @@ package modo.domain.dto.users.UsersReview;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.log4j.Log4j2;
 import modo.domain.entity.Users;
 
 import java.util.List;

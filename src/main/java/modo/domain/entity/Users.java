@@ -2,6 +2,7 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import modo.enums.UsersHistoryAddRequestType;
 import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;
@@ -39,4 +40,29 @@ public class Users {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersReview> usersReviewList = new ArrayList<>();
+
+    public void setUsersHistory(UsersHistory usersHistory) {
+        this.usersHistory = usersHistory;
+    }
+
+    public void addReview(UsersReview usersReview) {
+        // Add usersReview to usersReviewList; join
+        this.usersReviewList.add(usersReview);
+        // Adjust reviewScore and reviewCount
+        this.reviewScore = ((this.reviewCount * this.reviewScore) + usersReview.getScore()) / (double) (this.reviewCount + 1);
+        this.reviewCount++;
+    }
+
+    public void removeReview(UsersReview usersReview) {
+        if (this.reviewCount == 1) {
+            this.reviewScore = 0.0;
+            this.reviewCount = 0L;
+            this.usersReviewList.remove(usersReview);
+            return;
+        }
+        this.reviewScore = ((this.reviewCount * this.reviewScore) - usersReview.getScore()) / (double) (this.reviewCount - 1);
+        this.usersReviewList.remove(usersReview);
+        this.reviewCount--;
+    }
+
 }

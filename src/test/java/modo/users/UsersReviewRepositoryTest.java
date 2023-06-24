@@ -26,7 +26,9 @@ public class UsersReviewRepositoryTest {
                 .build();
 
         usersReviewRepository.save(usersReview);
-        UsersReview target = usersReviewRepository.findById(1L).orElseThrow(() -> new IllegalArgumentException(""));
+
+        Long usersReviewId = usersReview.getId();
+        UsersReview target = usersReviewRepository.findById(usersReviewId).orElseThrow(() -> new IllegalArgumentException(""));
 
         assertThat(target.getReviewedUsers()).isEqualTo(testUsersId);
         assertThat(target.getDescription()).isEqualTo(testDescription);
