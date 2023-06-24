@@ -1,6 +1,5 @@
 package modo.users;
 
-import lombok.extern.java.Log;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.users.Users.UsersResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
@@ -157,7 +156,7 @@ public class UsersServiceTest {
 
         // When
         // Test Method : usersService.findUsersReview
-        UsersReviewResponseDto resultDto = usersService.findUsersReview(testUsersId);
+        UsersReviewResponseDto resultDto = usersService.findUsersFetchReview(testUsersId);
 
         // Then
         // Check UsersReviewResponseDto
