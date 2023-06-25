@@ -101,7 +101,7 @@ public class UsersService {
     }
 
     private Users findUsersInRepository(String usersId) {
-        return usersRepository.findUsersByIdFetchUsersReviewList(usersId).orElseThrow(
+        return usersRepository.findById(usersId).orElseThrow(
                 () -> new IllegalArgumentException("Users with id : " + usersId + " is not exist")
         );
     }
