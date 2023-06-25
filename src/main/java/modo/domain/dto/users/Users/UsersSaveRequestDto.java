@@ -2,6 +2,7 @@ package modo.domain.dto.users.Users;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import modo.domain.entity.Users;
 import modo.util.GeomUtil;
 
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 
 @AllArgsConstructor
 @Builder
+@Getter
 public class UsersSaveRequestDto {
     private String usersId;
     private String password;

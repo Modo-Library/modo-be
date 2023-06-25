@@ -8,6 +8,7 @@ import modo.domain.entity.Users;
 
 @Getter
 @AllArgsConstructor
+@Builder
 public class UsersResponseDto {
     // Users
     private String usersId;

@@ -499,13 +499,4 @@ public class UsersServiceTest {
             .latitude(testX)
             .longitude(testY)
             .build();
-    Users testUsers = testUsersSaveRequestDto.toEntity();
-    UsersHistory testUsersHistory = UsersHistory.builder()
-            .usersId(testUsersId)
-            .buyCount(0L)
-            .sellCount(0L)
-            .rentingCount(0L)
-            .returningCount(0L)
-            .build();
-
 }
