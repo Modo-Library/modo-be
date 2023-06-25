@@ -55,14 +55,20 @@ public class UsersServiceTest {
     void Service_회원가입_테스트() {
         // When
         // Test Method : UsersService.save
-        String resultUsersId = usersService.save(testUsersSaveRequestDto);
+        UsersResponseDto resultResponseDto = usersService.save(testUsersSaveRequestDto);
 
         // Then
         // Test Return Value
-        assertThat(resultUsersId).isEqualTo(testUsersId);
+        assertThat(resultResponseDto.getUsersId()).isEqualTo(testUsersId);
+        assertThat(resultResponseDto.getNickname()).isEqualTo(testNickname);
+        assertThat(resultResponseDto.getBuyCount()).isEqualTo(0L);
+        assertThat(resultResponseDto.getSellCount()).isEqualTo(0L);
+        assertThat(resultResponseDto.getReviewCount()).isEqualTo(0L);
+        assertThat(resultResponseDto.getRentingCount()).isEqualTo(0L);
+        assertThat(resultResponseDto.getReviewScore()).isEqualTo(0.0);
 
         // Check Saved Users
-        Users resultUsers = usersRepository.findById(resultUsersId).orElseThrow(() -> new IllegalArgumentException(""));
+        Users resultUsers = usersRepository.findById(testUsersId).orElseThrow(() -> new IllegalArgumentException(""));
         assertThat(resultUsers.getUsersId()).isEqualTo(testUsersId);
         assertThat(resultUsers.getReviewScore()).isEqualTo(testReviewScore);
         assertThat(resultUsers.getNickname()).isEqualTo(testNickname);
@@ -74,7 +80,7 @@ public class UsersServiceTest {
         assertThat(resultUsers.getUsersHistory().getUsersId()).isEqualTo(testUsersId);
 
         // Check Saved UsersHistory
-        UsersHistory resultUsersHistory = usersHistoryRepository.findById(resultUsersId).orElseThrow(() -> new IllegalArgumentException(""));
+        UsersHistory resultUsersHistory = usersHistoryRepository.findById(testUsersId).orElseThrow(() -> new IllegalArgumentException(""));
         assertThat(resultUsersHistory.getUsersId()).isEqualTo(testUsersId);
         assertThat(resultUsersHistory.getRentingCount()).isEqualTo(0L);
         assertThat(resultUsersHistory.getReturningCount()).isEqualTo(0L);

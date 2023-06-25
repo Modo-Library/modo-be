@@ -26,7 +26,7 @@ public class UsersService {
     private final UsersReviewRepository usersReviewRepository;
 
     @Transactional
-    public String save(UsersSaveRequestDto usersSaveRequestDto) {
+    public UsersResponseDto save(UsersSaveRequestDto usersSaveRequestDto) {
         // Create users and usersHistory
         Users users = usersSaveRequestDto.toEntity();
         UsersHistory usersHistory = new UsersHistory(users);
@@ -39,7 +39,7 @@ public class UsersService {
         usersHistoryRepository.save(usersHistory);
 
         // Return usersId
-        return users.getUsersId();
+        return findUsers(users.getUsersId());
     }
 
     @Transactional(readOnly = true)
