@@ -1,50 +1,90 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.0'
-	id 'io.spring.dependency-management' version '1.1.0'
+    id 'java'
+    id 'org.springframework.boot' version '3.1.0'
+    id 'io.spring.dependency-management' version '1.1.0'
+    id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
+}
+
+configurations {
+    asciidoctorExt
 }
 
 dependencies {
-	// SpringBoot
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    // SpringBoot
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	// Databases : H2 Database, MySQL Connector
-	runtimeOnly 'com.h2database:h2'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+    // Databases : H2 Database, MySQL Connector
+    runtimeOnly 'com.h2database:h2'
+    runtimeOnly 'com.mysql:mysql-connector-j'
 
-	// JUnit5
-	testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
+    // JUnit5
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.9.3'
 
-	// Lombok
-	compileOnly 'org.projectlombok:lombok:1.18.28'
-	annotationProcessor 'org.projectlombok:lombok:1.18.28'
-	testCompileOnly 'org.projectlombok:lombok:1.18.28'
-	testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.28'
+    annotationProcessor 'org.projectlombok:lombok:1.18.28'
+    testCompileOnly 'org.projectlombok:lombok:1.18.28'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.28'
 
-	//AspectJ
-	implementation 'org.aspectj:aspectjweaver:1.9.19'
+    //AspectJ
+    implementation 'org.aspectj:aspectjweaver:1.9.19'
 
-	// Log4j2
-	implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
-	implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    // Log4j2
+    implementation 'org.apache.logging.log4j:log4j-api:2.20.0'
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
 
-	// Hibernate Dependency for MySQL Point
-	implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '6.2.2.Final'
+    // Hibernate Dependency for MySQL Point
+    implementation group: 'org.hibernate', name: 'hibernate-spatial', version: '6.2.2.Final'
+
+    // Spring REST Docs
+    asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor:3.0.0'
+    testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.0'
+}
+
+ext {
+    snippetsDir = file('build/generated-snippets')
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
+}
+
+test {
+    outputs.dir snippetsDir
+}
+
+asciidoctor {
+    inputs.dir snippetsDir
+    configurations 'asciidoctorExt'
+    dependsOn test
+}
+
+task copyDocument(type: Copy) {
+    dependsOn asciidoctor
+    from file("build/docs/asciidoc")
+    into file("src/main/resources/static/docs")
+}
+
+build {
+    dependsOn copyDocument
+}
+
+bootJar {
+    dependsOn asciidoctor
+    from("${asciidoctor.outputDir}/html5") {
+        into 'static/docs'
+    }
 }
