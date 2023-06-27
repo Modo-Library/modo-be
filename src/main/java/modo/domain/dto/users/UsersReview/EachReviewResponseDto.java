@@ -9,6 +9,7 @@ import modo.domain.entity.UsersReview;
 @Setter
 @Getter
 @AllArgsConstructor
+@Builder
 public class EachReviewResponseDto {
     private String usersId;
     private Long score;
