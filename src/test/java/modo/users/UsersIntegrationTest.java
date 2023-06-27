@@ -98,7 +98,6 @@ public class UsersIntegrationTest {
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestFields(
                                 fieldWithPath("usersId").description("Saving user's usersId").type(JsonFieldType.STRING),
-                                fieldWithPath("password").description("Saving user's password").type(JsonFieldType.STRING),
                                 fieldWithPath("nickname").description("Saving user's nickname").type(JsonFieldType.STRING),
                                 fieldWithPath("latitude").description("Saving user's latitude. Type : double").type(JsonFieldType.NUMBER),
                                 fieldWithPath("longitude").description("Saving user's longitude. Type : double").type(JsonFieldType.NUMBER)
@@ -257,9 +256,7 @@ public class UsersIntegrationTest {
     }
 
     static final String testUsersId = "testUsersId";
-    static final String testPassword = "testPassword";
     static final String testNickname = "testNickname";
-    static final Point testLocation = GeomUtil.createPoint(1.1, 2.2);
     static final double testX = 1.1;
     static final double testY = 2.2;
     static final double testReviewScore = 0.0;
@@ -269,7 +266,6 @@ public class UsersIntegrationTest {
     static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
             .usersId(testUsersId)
             .nickname(testNickname)
-            .password(testPassword)
             .latitude(testX)
             .longitude(testY)
             .build();

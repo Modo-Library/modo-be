@@ -32,7 +32,6 @@ public class UsersRepositoryTest {
                 .nickname(testNickname)
                 .location(testLocation)
                 .reviewScore(testReviewScore)
-                .password(testPassword)
                 .reviewCount(testReviewCount)
                 .build();
 
@@ -43,7 +42,6 @@ public class UsersRepositoryTest {
 
         assertThat(target.getUsersId()).isEqualTo(testUsersId);
         assertThat(target.getNickname()).isEqualTo(testNickname);
-        assertThat(target.getPassword()).isEqualTo(testPassword);
         assertThat(target.getReviewScore()).isEqualTo(testReviewScore);
         assertThat(target.getLocation().getX()).isEqualTo(testX);
         assertThat(target.getLocation().getY()).isEqualTo(testY);
@@ -86,7 +84,6 @@ public class UsersRepositoryTest {
                 .nickname(testNickname)
                 .location(testLocation)
                 .reviewScore(testReviewScore)
-                .password(testPassword)
                 .reviewCount(testReviewCount)
                 .build();
 

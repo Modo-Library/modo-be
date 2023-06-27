@@ -13,7 +13,6 @@ import java.util.ArrayList;
 @Getter
 public class UsersSaveRequestDto {
     private String usersId;
-    private String password;
     private String nickname;
     private double latitude;
     private double longitude;
@@ -21,7 +20,6 @@ public class UsersSaveRequestDto {
     public Users toEntity() {
         return Users.builder()
                 .usersId(usersId)
-                .password(password)
                 .nickname(nickname)
                 .location(GeomUtil.createPoint(latitude, longitude))
                 .reviewScore(0.0)

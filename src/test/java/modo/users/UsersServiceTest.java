@@ -483,7 +483,6 @@ public class UsersServiceTest {
     }
 
     static final String testUsersId = "testUsersId";
-    static final String testPassword = "testPassword";
     static final String testNickname = "testNickname";
     static final Point testLocation = GeomUtil.createPoint(1.1, 2.2);
     static final double testX = 1.1;
@@ -495,7 +494,6 @@ public class UsersServiceTest {
     static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
             .usersId(testUsersId)
             .nickname(testNickname)
-            .password(testPassword)
             .latitude(testX)
             .longitude(testY)
             .build();

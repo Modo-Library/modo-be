@@ -20,9 +20,6 @@ public class Users {
     @Column
     private String usersId;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column(nullable = false, unique = true)
     private String nickname;
 
