@@ -1,0 +1,28 @@
+= Modo BE API Docs
+Powered By Dongwhwan Lee, https://github.com/hwanld
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+[[Users-save]]
+== Users-save
+
+operation::Users-save[snippets='http-request,request-fields,http-response,response-fields']
+
+[[Users-findUsers]]
+== Users-findUsers
+
+operation::Users-findUsers[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Users-findUsersFetchReview]]
+== Users-findUsersFetchReview
+
+operation::Users-findUsersFetchReview[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Users-addReview]]
+== Users-addReview
+
+operation::Users-addReview[snippets='http-request,path-parameters,response-fields,http-response,response-fields']
