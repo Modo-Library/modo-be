@@ -20,7 +20,7 @@ public class Users {
     @Column
     private String usersId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String nickname;
 
     @Column
