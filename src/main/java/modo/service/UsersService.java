@@ -13,6 +13,8 @@ import modo.domain.entity.UsersReview;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,6 +102,10 @@ public class UsersService {
         return findUsers(usersId);
     }
 
+    public void login() {
+        log.info("UsersService.login is called!");
+    }
+
     private Users findUsersInRepository(String usersId) {
         return usersRepository.findById(usersId).orElseThrow(
                 () -> new IllegalArgumentException("Users with id : " + usersId + " is not exist")
@@ -122,5 +128,9 @@ public class UsersService {
         return usersReviewRepository.findById(usersReviewId).orElseThrow(
                 () -> new IllegalArgumentException("UsersReview with id : " + usersReviewId + " is not exist")
         );
+    }
+
+    public boolean isExistsByUsersId(String usersId) {
+        return usersRepository.existsByUsersId(usersId);
     }
 }
