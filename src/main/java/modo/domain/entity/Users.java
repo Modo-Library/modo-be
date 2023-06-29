@@ -2,7 +2,6 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import modo.enums.UsersHistoryAddRequestType;
 import org.locationtech.jts.geom.Point;
 
 import java.util.ArrayList;

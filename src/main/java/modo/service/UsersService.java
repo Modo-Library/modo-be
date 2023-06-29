@@ -13,8 +13,6 @@ import modo.domain.entity.UsersReview;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
