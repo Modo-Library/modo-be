@@ -3,7 +3,7 @@ package modo.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import modo.domain.dto.users.Users.UsersResponseDto;
+import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,11 +37,11 @@ public class KakaoLoginService {
     @Value("${kakao.redirectUrl}")
     private String redirectUrl;
 
-    public UsersResponseDto loginOrRegister(String code) throws Exception {
+    public UsersLoginResponseDto loginOrRegister(String code) throws Exception {
         return getKakaoToken(code);
     }
 
-    public UsersResponseDto getKakaoToken(String code) throws Exception {
+    public UsersLoginResponseDto getKakaoToken(String code) throws Exception {
         final String grantType = "authorization_code";
         final String tokenRequestUrl = "https://kauth.kakao.com/oauth/token";
         final String contentType = "Content-Type: application/x-www-form-urlencoded";
@@ -63,7 +63,7 @@ public class KakaoLoginService {
         return getKakaoUserInfo(accessToken);
     }
 
-    public UsersResponseDto getKakaoUserInfo(String accessToken) throws Exception {
+    public UsersLoginResponseDto getKakaoUserInfo(String accessToken) throws Exception {
         final String userInfoRequestUrl = "https://kapi.kakao.com/v2/user/me";
         final JSONArray property_keys = new JSONArray();
         property_keys.put("kakao_account.email");
@@ -85,10 +85,10 @@ public class KakaoLoginService {
         String nickname = profile.getString("nickname");
         String email = kakao_acount.getString("email");
 
-        return loginOrRegister(nickname, email);
+        return registerAndLogin(nickname, email);
     }
 
-    public UsersResponseDto loginOrRegister(String nickname, String email) throws Exception {
+    public UsersLoginResponseDto registerAndLogin(String nickname, String email) throws Exception {
         if (!usersService.isExistsByUsersId(email)) {
             UsersSaveRequestDto requestDto = UsersSaveRequestDto.builder()
                     .usersId(email)
@@ -97,10 +97,9 @@ public class KakaoLoginService {
                     .longitude(longitude_ajou)
                     .build();
 
-            return usersService.save(requestDto);
+            usersService.save(requestDto);
         }
-        throw new Exception();
-//        usersService.login();
+        return usersService.login(email);
     }
 
     private static final double latitude_ajou = 37.28016;
