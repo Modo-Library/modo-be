@@ -1,6 +1,7 @@
 package modo.users;
 
 import lombok.extern.log4j.Log4j2;
+import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.dto.users.UsersHistory.UsersHistoryAddRequestDto;
@@ -18,6 +19,7 @@ import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -39,6 +41,9 @@ public class UsersServiceTest {
     @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
+    @Mock
+    private JwtTokenProvider jwtTokenProvider;
+
     UsersService usersService;
 
     @BeforeEach
@@ -48,7 +53,7 @@ public class UsersServiceTest {
 
     @BeforeEach
     void injectRepositoryToUsersService() {
-        usersService = new UsersService(usersRepository, usersHistoryRepository, usersReviewRepository);
+        usersService = new UsersService(usersRepository, usersHistoryRepository, usersReviewRepository, jwtTokenProvider);
     }
 
     @Test

@@ -2,6 +2,8 @@ package modo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import modo.auth.JwtTokenProvider;
+import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.domain.dto.users.Users.UsersResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.dto.users.UsersHistory.UsersHistoryAddRequestDto;
@@ -13,8 +15,6 @@ import modo.domain.entity.UsersReview;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,6 +26,7 @@ public class UsersService {
     private final UsersRepository usersRepository;
     private final UsersHistoryRepository usersHistoryRepository;
     private final UsersReviewRepository usersReviewRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Transactional
     public UsersResponseDto save(UsersSaveRequestDto usersSaveRequestDto) {
@@ -42,6 +43,13 @@ public class UsersService {
 
         // Return usersId
         return findUsers(users.getUsersId());
+    }
+
+    public UsersLoginResponseDto login(String usersId) {
+        return UsersLoginResponseDto.builder()
+                .accessToken(jwtTokenProvider.createAccessToken(usersId))
+                .refreshToken(jwtTokenProvider.createAccessToken(usersId))
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -100,10 +108,6 @@ public class UsersService {
 
         // Find Users and return UsersResponseDto
         return findUsers(usersId);
-    }
-
-    public void login() {
-        log.info("UsersService.login is called!");
     }
 
     private Users findUsersInRepository(String usersId) {
