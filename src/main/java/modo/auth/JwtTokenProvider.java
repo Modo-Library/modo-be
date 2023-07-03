@@ -89,7 +89,10 @@ public class JwtTokenProvider {
 
     public String resolveToken(HttpServletRequest request) throws Exception {
         String token = request.getHeader("Token");
-        if (token == null) throw new Exception();
+        if (token == null) {
+            log.warn("token is null");
+            throw new Exception();
+        }
         return token;
     }
 
