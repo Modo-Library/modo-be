@@ -110,6 +110,20 @@ public class UsersService {
         return findUsers(usersId);
     }
 
+    @Transactional
+    public UsersResponseDto changeNickname(String usersId, String nickname) {
+        Users users = findUsersInRepository(usersId);
+        users.setNickname(nickname);
+        return findUsers(usersId);
+    }
+
+    @Transactional
+    public UsersResponseDto changeLocation(String usersId, double latitude, double longitude) {
+        Users users = findUsersInRepository(usersId);
+        users.updateLocation(latitude, longitude);
+        return findUsers(usersId);
+    }
+
     private Users findUsersInRepository(String usersId) {
         return usersRepository.findById(usersId).orElseThrow(
                 () -> new IllegalArgumentException("Users with id : " + usersId + " is not exist")

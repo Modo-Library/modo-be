@@ -43,4 +43,14 @@ public class UsersController extends BaseController {
         return sendResponse(usersService.removeReview(usersReviewId));
     }
 
+    @PutMapping("api/v1/users/changeNickname/{usersId}/{nickname}")
+    public ResponseEntity<?> changeNickname(@PathVariable String usersId, @PathVariable String nickname) {
+        return sendResponse(usersService.changeNickname(usersId, nickname));
+    }
+
+    @PutMapping("api/v1/users/changeLocation/{usersId}/{latitude}/{longitude}")
+    public ResponseEntity<?> changeLocation(@PathVariable String usersId, @PathVariable double latitude, @PathVariable double longitude) {
+        return sendResponse(usersService.changeLocation(usersId, latitude, longitude));
+    }
+
 }

@@ -25,4 +25,14 @@ operation::Users-findUsersFetchReview[snippets='http-request,path-parameters,htt
 [[Users-addReview]]
 == Users-addReview
 
-operation::Users-addReview[snippets='http-request,path-parameters,response-fields,http-response,response-fields']
+operation::Users-addReview[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Users-changeNickname]]
+== Users-changeNickname
+
+operation::Users-changeNickname[snippets='http-request,path-parameters,http-response,response-fields']
+
+[[Users-changeLocation]]
+== Users-changeLocation
+
+operation::Users-changeLocation[snippets='http-request,path-parameters,http-response,response-fields']

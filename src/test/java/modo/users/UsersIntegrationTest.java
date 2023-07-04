@@ -9,11 +9,9 @@ import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
-import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -254,6 +252,100 @@ public class UsersIntegrationTest {
                 .andDo(print());
 
     }
+
+    @Test
+    void Integration_닉네임변경_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v1/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        UsersResponseDto newTestUsersResponseDto = UsersResponseDto.builder()
+                .usersId(testUsersId)
+                .nickname("new" + testNickname)
+                .reviewScore(testReviewScore)
+                .reviewCount(testReviewCount)
+                .buyCount(0L)
+                .sellCount(0L)
+                .rentingCount(0L)
+                .returningCount(0L)
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/changeNickname/{usersId}/{nickname}", testUsersId, "new" + testNickname)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
+                .andDo(document("Users-changeNickname",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        pathParameters(
+                                parameterWithName("usersId").description("Changing nickname target user's usersId"),
+                                parameterWithName("nickname").description("New nickname value")
+                        ),
+                        responseFields(
+                                fieldWithPath("usersId").description("Finding user's usersId").type(JsonFieldType.STRING),
+                                fieldWithPath("nickname").description("Finding user's nickname").type(JsonFieldType.STRING),
+                                fieldWithPath("reviewScore").description("Finding user's average reviewScore. Type : double. Default :0.0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("reviewCount").description("Finding user's total reviewCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("rentingCount").description("Finding user's history : total rentingCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("returningCount").description("Finding user's history : total returningCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("buyCount").description("Finding user's history : total buyCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("sellCount").description("Finding user's history : total sellCount. Default : 0L").type(JsonFieldType.NUMBER)
+
+                        )))
+                .andDo(print());
+    }
+
+    @Test
+    void Integration_위치변경_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v1/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        UsersResponseDto newTestUsersResponseDto = UsersResponseDto.builder()
+                .usersId(testUsersId)
+                .nickname(testNickname)
+                .reviewScore(testReviewScore)
+                .reviewCount(testReviewCount)
+                .buyCount(0L)
+                .sellCount(0L)
+                .rentingCount(0L)
+                .returningCount(0L)
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/changeLocation/{usersId}/{latitude}/{longitude}", testUsersId, 10.1954, 126.6324)
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
+                .andDo(document("Users-changeLocation",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        pathParameters(
+                                parameterWithName("usersId").description("Changing location target user's usersId"),
+                                parameterWithName("latitude").description("New latitude value"),
+                                parameterWithName("longitude").description("New longitude value")
+                        ),
+                        responseFields(
+                                fieldWithPath("usersId").description("Finding user's usersId").type(JsonFieldType.STRING),
+                                fieldWithPath("nickname").description("Finding user's nickname").type(JsonFieldType.STRING),
+                                fieldWithPath("reviewScore").description("Finding user's average reviewScore. Type : double. Default :0.0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("reviewCount").description("Finding user's total reviewCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("rentingCount").description("Finding user's history : total rentingCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("returningCount").description("Finding user's history : total returningCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("buyCount").description("Finding user's history : total buyCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("sellCount").description("Finding user's history : total sellCount. Default : 0L").type(JsonFieldType.NUMBER)
+
+                        )))
+                .andDo(print());
+    }
+
 
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";

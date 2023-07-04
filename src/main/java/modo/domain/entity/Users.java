@@ -2,6 +2,7 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import modo.util.GeomUtil;
 import org.locationtech.jts.geom.Point;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -62,6 +63,10 @@ public class Users implements UserDetails {
         this.reviewScore = ((this.reviewCount * this.reviewScore) - usersReview.getScore()) / (double) (this.reviewCount - 1);
         this.usersReviewList.remove(usersReview);
         this.reviewCount--;
+    }
+
+    public void updateLocation(double latitude, double longitude) {
+        setLocation(GeomUtil.createPoint(latitude, longitude));
     }
 
     @Override
