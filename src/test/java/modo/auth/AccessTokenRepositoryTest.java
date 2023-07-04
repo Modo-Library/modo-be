@@ -1,14 +1,11 @@
-package modo.tokens;
+package modo.auth;
 
-import modo.configuration.RedisConfiguration;
 import modo.domain.entity.AccessToken;
 import modo.repository.AccessTokenRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 import static org.assertj.core.api.Assertions.assertThat;

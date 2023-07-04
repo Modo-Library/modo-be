@@ -2,6 +2,7 @@ package modo.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
 import modo.service.KakaoLoginService;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsersController extends BaseController {
     private final UsersService usersService;
     private final KakaoLoginService kakaoLoginService;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("api/v1/users/save")
     public ResponseEntity<?> save(@RequestBody UsersSaveRequestDto requestDto) {
@@ -39,11 +41,6 @@ public class UsersController extends BaseController {
     @DeleteMapping("api/v1/users/removeReview/{usersReviewId}")
     public ResponseEntity<?> removeReview(@PathVariable Long usersReviewId) {
         return sendResponse(usersService.removeReview(usersReviewId));
-    }
-
-    @GetMapping("/oauth/kakao")
-    public ResponseEntity<?> kakaoLogin(@RequestParam("code") String code) throws Exception {
-        return sendResponse(kakaoLoginService.loginOrRegister(code));
     }
 
 }
