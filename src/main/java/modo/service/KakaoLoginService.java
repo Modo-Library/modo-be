@@ -90,10 +90,6 @@ public class KakaoLoginService {
     }
 
     public UsersLoginResponseDto registerAndLogin(String nickname, String email) throws Exception {
-        if (email == null) {
-            email = UUID.randomUUID().toString();
-        }
-
         if (!usersService.isExistsByUsersId(email)) {
             UsersSaveRequestDto requestDto = UsersSaveRequestDto.builder()
                     .usersId(email)
