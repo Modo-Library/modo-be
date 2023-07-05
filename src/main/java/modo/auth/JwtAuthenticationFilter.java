@@ -22,6 +22,11 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
         StringBuffer path = ((HttpServletRequest) request).getRequestURL();
+        logger.info(path);
+        if (path.toString().contains("/docs/")) {
+            chain.doFilter(request, response);
+            return;
+        }
 
         String token = null;
         try {

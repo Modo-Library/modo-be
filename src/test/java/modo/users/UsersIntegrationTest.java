@@ -9,11 +9,9 @@ import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
-import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -30,12 +28,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -63,6 +64,7 @@ public class UsersIntegrationTest {
     void setUpMockMvcForRestDocs(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
+//                .apply(springSecurity())
                 .build();
     }
 
@@ -87,7 +89,7 @@ public class UsersIntegrationTest {
                 .sellCount(0L)
                 .build();
 
-        mockMvc.perform(post("/api/v1/users/save")
+        mockMvc.perform(post("/api/v2/users/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
                 )
@@ -123,7 +125,7 @@ public class UsersIntegrationTest {
     void Integration_회원조회_테스트() throws Exception {
 
         // Save Users First
-        mockMvc.perform(post("/api/v1/users/save")
+        mockMvc.perform(post("/api/v2/users/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
                 )
@@ -131,11 +133,15 @@ public class UsersIntegrationTest {
 
         mockMvc.perform(get("/api/v1/users/findUsers/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", "AccessTokenValue")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersResponseDto)))
                 .andDo(document("Users-findUsers", Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        ),
                         pathParameters(
                                 parameterWithName("usersId").description("Finding user's usersId")
                         ),
@@ -167,7 +173,7 @@ public class UsersIntegrationTest {
                 .build();
 
         // Save Users First
-        mockMvc.perform(post("/api/v1/users/save")
+        mockMvc.perform(post("/api/v2/users/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
                 )
@@ -182,12 +188,16 @@ public class UsersIntegrationTest {
 
         mockMvc.perform(get("/api/v1/users/findUsersFetchReview/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", "AccessTokenValue")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersReviewResponseDto)))
                 .andDo(document("Users-findUsersFetchReview",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        ),
                         pathParameters(
                                 parameterWithName("usersId").description("Finding user's usersId")
                         ),
@@ -207,7 +217,7 @@ public class UsersIntegrationTest {
     @Test
     void Integration_리뷰추가_테스트() throws Exception {
         // Save Users First
-        mockMvc.perform(post("/api/v1/users/save")
+        mockMvc.perform(post("/api/v2/users/save")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
                 )
@@ -227,12 +237,16 @@ public class UsersIntegrationTest {
         mockMvc.perform(put("/api/v1/users/addReview/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(UsersReviewSaveRequestDto.builder().usersId(testUsersId).score(5L).description(testDescription).build()))
+                        .header("token", "AccessTokenValue")
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersReviewResponseDto)))
                 .andDo(document("Users-addReview",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        ),
                         pathParameters(
                                 parameterWithName("usersId").description("Adding review target user's usersId")
                         ),
@@ -254,6 +268,108 @@ public class UsersIntegrationTest {
                 .andDo(print());
 
     }
+
+    @Test
+    void Integration_닉네임변경_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        UsersResponseDto newTestUsersResponseDto = UsersResponseDto.builder()
+                .usersId(testUsersId)
+                .nickname("new" + testNickname)
+                .reviewScore(testReviewScore)
+                .reviewCount(testReviewCount)
+                .buyCount(0L)
+                .sellCount(0L)
+                .rentingCount(0L)
+                .returningCount(0L)
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/changeNickname/{usersId}/{nickname}", testUsersId, "new" + testNickname)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", "AccessTokenValue")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
+                .andDo(document("Users-changeNickname",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        ),
+                        pathParameters(
+                                parameterWithName("usersId").description("Changing nickname target user's usersId"),
+                                parameterWithName("nickname").description("New nickname value")
+                        ),
+                        responseFields(
+                                fieldWithPath("usersId").description("Finding user's usersId").type(JsonFieldType.STRING),
+                                fieldWithPath("nickname").description("Finding user's nickname").type(JsonFieldType.STRING),
+                                fieldWithPath("reviewScore").description("Finding user's average reviewScore. Type : double. Default :0.0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("reviewCount").description("Finding user's total reviewCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("rentingCount").description("Finding user's history : total rentingCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("returningCount").description("Finding user's history : total returningCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("buyCount").description("Finding user's history : total buyCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("sellCount").description("Finding user's history : total sellCount. Default : 0L").type(JsonFieldType.NUMBER)
+
+                        )))
+                .andDo(print());
+    }
+
+    @Test
+    void Integration_위치변경_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        UsersResponseDto newTestUsersResponseDto = UsersResponseDto.builder()
+                .usersId(testUsersId)
+                .nickname(testNickname)
+                .reviewScore(testReviewScore)
+                .reviewCount(testReviewCount)
+                .buyCount(0L)
+                .sellCount(0L)
+                .rentingCount(0L)
+                .returningCount(0L)
+                .build();
+
+        mockMvc.perform(put("/api/v1/users/changeLocation/{usersId}/{latitude}/{longitude}", testUsersId, 10.1954, 126.6324)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", "AccessTokenValue")
+                )
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
+                .andDo(document("Users-changeLocation",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        ),
+                        pathParameters(
+                                parameterWithName("usersId").description("Changing location target user's usersId"),
+                                parameterWithName("latitude").description("New latitude value"),
+                                parameterWithName("longitude").description("New longitude value")
+                        ),
+                        responseFields(
+                                fieldWithPath("usersId").description("Finding user's usersId").type(JsonFieldType.STRING),
+                                fieldWithPath("nickname").description("Finding user's nickname").type(JsonFieldType.STRING),
+                                fieldWithPath("reviewScore").description("Finding user's average reviewScore. Type : double. Default :0.0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("reviewCount").description("Finding user's total reviewCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("rentingCount").description("Finding user's history : total rentingCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("returningCount").description("Finding user's history : total returningCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("buyCount").description("Finding user's history : total buyCount. Default : 0L").type(JsonFieldType.NUMBER),
+                                fieldWithPath("sellCount").description("Finding user's history : total sellCount. Default : 0L").type(JsonFieldType.NUMBER)
+
+                        )))
+                .andDo(print());
+    }
+
 
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";
