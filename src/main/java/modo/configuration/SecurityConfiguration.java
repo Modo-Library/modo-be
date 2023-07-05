@@ -34,7 +34,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/docs/**").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/error").permitAll()
-                                .anyRequest().authenticated()
+                                .requestMatchers("/api/v1/**").authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
