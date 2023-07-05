@@ -18,7 +18,7 @@ public class UsersController extends BaseController {
     private final KakaoLoginService kakaoLoginService;
     private final JwtTokenProvider jwtTokenProvider;
 
-    @PostMapping("api/v1/users/save")
+    @PostMapping("api/v2/users/save")
     public ResponseEntity<?> save(@RequestBody UsersSaveRequestDto requestDto) {
         return sendResponse(usersService.save(requestDto));
     }
