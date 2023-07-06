@@ -37,7 +37,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.UsernameNotFoundException);
         } catch (Exception e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.ACCEPTED, response, e, ErrorCode.UnknownException);
+            setErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, response, e, ErrorCode.UnknownException);
         }
     }
 
