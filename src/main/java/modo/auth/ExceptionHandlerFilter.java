@@ -25,28 +25,25 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (TokenIsExpiredException e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.BAD_REQUEST, response, e.getMessage(), ErrorCode.TokenIsExpiredException);
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.TokenIsExpiredException);
         } catch (TokenIsNullException e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.BAD_REQUEST, response, e.getMessage(), ErrorCode.TokenIsNullException);
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.TokenIsNullException);
         } catch (SignatureException e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.BAD_REQUEST, response, e.getMessage(), ErrorCode.SignatureException);
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.SignatureException);
         } catch (UsernameNotFoundException e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.BAD_REQUEST, response, e.getMessage(), ErrorCode.UsernameNotFoundException);
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.UsernameNotFoundException);
         } catch (Exception e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.ACCEPTED, response, e.getMessage(), ErrorCode.UnknownException);
+            setErrorResponse(HttpStatus.ACCEPTED, response, e, ErrorCode.UnknownException);
         }
     }
 
-    public void setErrorResponse(HttpStatus httpStatus, HttpServletResponse response, String message, ErrorCode errorCode) {
-        ErrorJson errorJson = ErrorJson.builder()
-                .message(message)
-                .errorCode(errorCode.getErrorCode())
-                .name(errorCode.name())
-                .build();
+    public void setErrorResponse(HttpStatus httpStatus, HttpServletResponse response, Exception e, ErrorCode errorCode) {
+
+        ErrorJson errorJson = new ErrorJson(e, errorCode);
 
         response.setStatus(httpStatus.value());
         response.setContentType("application/json");
@@ -58,6 +55,6 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
             throw new RuntimeException(ex);
         }
 
-        log.warn("* Error raised! message : {}, errorCode : {}, name : {} *", message, errorCode.getErrorCode(), errorCode.name());
+        log.warn("* Error raised! message : {}, errorCode : {}, name : {} *", e.getMessage(), errorCode.getErrorCode(), errorCode.name());
     }
 }

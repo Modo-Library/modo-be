@@ -116,8 +116,7 @@ public class JwtTokenProvider {
         return redisTokenService.findAccessToken(usersId) == null;
     }
 
-    public String reIssue(HttpServletRequest request) throws ReIssueBeforeAccessTokenExpiredException, RefreshTokenExpiredException {
-        String refreshToken = resolveToken(request);
+    public String reIssue(String refreshToken) throws ReIssueBeforeAccessTokenExpiredException, RefreshTokenExpiredException {
         String usersId = getUsersId(refreshToken);
 
         // Request Reissue before AccessToken Expired
