@@ -45,10 +45,11 @@ public class UsersService {
         return findUsers(users.getUsersId());
     }
 
+    @Transactional
     public UsersLoginResponseDto login(String usersId) {
         return UsersLoginResponseDto.builder()
                 .accessToken(jwtTokenProvider.createAccessToken(usersId))
-                .refreshToken(jwtTokenProvider.createAccessToken(usersId))
+                .refreshToken(jwtTokenProvider.createRefreshToken(usersId))
                 .build();
     }
 

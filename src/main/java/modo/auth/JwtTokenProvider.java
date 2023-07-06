@@ -6,12 +6,17 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.enums.TokenType;
+import modo.exception.authException.ReIssueBeforeAccessTokenExpiredException;
+import modo.exception.authException.RefreshTokenExpiredException;
+import modo.exception.authException.TokenIsExpiredException;
+import modo.exception.authException.TokenIsNullException;
 import modo.service.CustomUserDetailService;
 import modo.service.RedisTokenService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
@@ -53,7 +58,7 @@ public class JwtTokenProvider {
         else tokenValidTime = refreshTokenValidTime;
 
         Claims claims = Jwts.claims().setSubject(usersId);
-//        claims.setId(usersId);
+
         Date now = new Date();
         return Jwts.builder()
                 .setClaims(claims)
@@ -74,31 +79,31 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailService.loadUserByUsername(getUID(token));
+    public Authentication getAuthentication(String token) throws UsernameNotFoundException {
+        UserDetails userDetails = userDetailService.loadUserByUsername(getUsersId(token));
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    public String getUID(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
     public String getUsersId(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
     }
 
-    public String resolveToken(HttpServletRequest request) throws Exception {
+    public String resolveToken(HttpServletRequest request) throws TokenIsNullException {
         String token = request.getHeader("Token");
-        if (token == null) {
-            log.warn("token is null");
-            throw new Exception();
+        if (token != null) {
+            return token;
         }
-        return token;
+        throw new TokenIsNullException();
     }
 
-    public boolean validateToken(String token) throws Exception {
+    public void validateToken(String token) throws SignatureException {
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
-        return !claims.getBody().getExpiration().before(new Date());
+
+        if (!claims.getBody().getExpiration().before(new Date())) {
+            return;
+        }
+
+        throw new TokenIsExpiredException();
     }
 
     private boolean checkRefreshTokenIsExpired(String token) {
@@ -107,23 +112,23 @@ public class JwtTokenProvider {
     }
 
     private Boolean checkAccessTokenIsExpired(String token) {
-        String usersId = getUID(token);
+        String usersId = getUsersId(token);
         return redisTokenService.findAccessToken(usersId) == null;
     }
 
-    public String reIssue(HttpServletRequest request) throws Exception {
+    public String reIssue(HttpServletRequest request) throws ReIssueBeforeAccessTokenExpiredException, RefreshTokenExpiredException {
         String refreshToken = resolveToken(request);
-
-        // RefreshToken is not expired, throw exception
-        if (checkRefreshTokenIsExpired(refreshToken))
-            throw new Exception();
-
-        // AccessToken is expired, throw exception
-        if (!checkAccessTokenIsExpired(refreshToken))
-            throw new Exception();
-
-        String UID = getUID(refreshToken);
         String usersId = getUsersId(refreshToken);
+
+        // Request Reissue before AccessToken Expired
+        if (!checkAccessTokenIsExpired(refreshToken)) {
+            throw new ReIssueBeforeAccessTokenExpiredException();
+        }
+
+        // Request Reissue after RefreshToken Expired
+        if (checkRefreshTokenIsExpired(refreshToken)) {
+            throw new RefreshTokenExpiredException();
+        }
 
         return createAccessToken(usersId);
     }

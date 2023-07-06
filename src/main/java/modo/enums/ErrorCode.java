@@ -10,27 +10,16 @@ public enum ErrorCode {
     UsersIdAlreadyExistException(1000),
     UsersIdOrPasswordInvalidException(1001),
     DuplicateUserSaveException(1003),
+    UsernameNotFoundException(1004),
 
     // Auth ErrorCode
-    ExpiredJwtException(2000),
+    TokenIsExpiredException(2000),
     ReIssueBeforeAccessTokenExpiredException(2001),
     TokenIsNullException(2002),
     SignatureException(2003),
+    RefreshTokenExpiredException(2004),
 
-    // FirebaseAuth ErrorCode
-    FirebaseAuthException(3000),
-
-    // Bags ErrorCode
-    ReturnRequestUserMismatchException(4000),
-    AlreadyRentedException(4001),
-
-    UnknownException(5000),
-
-    // Admin ErrorCode
-    UsersIsAlreadyAdminException(6000),
-    UsersIsNotAdminException(6001),
-    CertificationSignatureException(6002),
-    CertificationTimeExpireException(6003);
+    UnknownException(5000);
 
     private final int errorCode;
 }
