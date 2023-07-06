@@ -1,11 +1,13 @@
 package modo.users;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.dto.users.UsersReview.EachReviewResponseDto;
 import modo.domain.dto.users.UsersReview.UsersReviewResponseDto;
 import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
+import modo.repository.AccessTokenRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.repository.UsersReviewRepository;
@@ -55,16 +57,23 @@ public class UsersIntegrationTest {
     @Autowired
     private UsersReviewRepository usersReviewRepository;
 
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
+    private AccessTokenRepository accessTokenRepository;
+
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
+    private String accessToken;
 
     @BeforeEach
     void setUpMockMvcForRestDocs(WebApplicationContext webApplicationContext, RestDocumentationContextProvider restDocumentation) {
         this.mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext)
                 .apply(documentationConfiguration(restDocumentation))
-//                .apply(springSecurity())
+                .apply(springSecurity())
                 .build();
     }
 
@@ -73,6 +82,7 @@ public class UsersIntegrationTest {
         usersReviewRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
+        accessTokenRepository.deleteAll();
     }
 
     @Test
@@ -131,9 +141,11 @@ public class UsersIntegrationTest {
                 )
                 .andExpect(status().isOk());
 
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
         mockMvc.perform(get("/api/v1/users/findUsers/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("token", "AccessTokenValue")
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersResponseDto)))
@@ -179,16 +191,19 @@ public class UsersIntegrationTest {
                 )
                 .andExpect(status().isOk());
 
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
         // Add Review
         mockMvc.perform(put("/api/v1/users/addReview/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(UsersReviewSaveRequestDto.builder().usersId(testUsersId).score(5L).description(testDescription).build()))
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk());
 
         mockMvc.perform(get("/api/v1/users/findUsersFetchReview/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("token", "AccessTokenValue")
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersReviewResponseDto)))
@@ -234,10 +249,12 @@ public class UsersIntegrationTest {
                 .reviewResponseDtoList(testReviewResponseDtoList)
                 .build();
 
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
         mockMvc.perform(put("/api/v1/users/addReview/{usersId}", testUsersId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(UsersReviewSaveRequestDto.builder().usersId(testUsersId).score(5L).description(testDescription).build()))
-                        .header("token", "AccessTokenValue")
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(testUsersReviewResponseDto)))
@@ -289,9 +306,11 @@ public class UsersIntegrationTest {
                 .returningCount(0L)
                 .build();
 
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
         mockMvc.perform(put("/api/v1/users/changeNickname/{usersId}/{nickname}", testUsersId, "new" + testNickname)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("token", "AccessTokenValue")
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
@@ -339,9 +358,11 @@ public class UsersIntegrationTest {
                 .returningCount(0L)
                 .build();
 
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
         mockMvc.perform(put("/api/v1/users/changeLocation/{usersId}/{latitude}/{longitude}", testUsersId, 10.1954, 126.6324)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("token", "AccessTokenValue")
+                        .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(newTestUsersResponseDto)))
