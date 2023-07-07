@@ -1,5 +1,6 @@
 package modo.exception.authException;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import lombok.extern.log4j.Log4j2;
 import modo.controller.BaseController;
@@ -13,11 +14,11 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 @Log4j2
 public class AuthExceptionHandler extends BaseController {
-    @ExceptionHandler(TokenIsExpiredException.class)
-    public ResponseEntity<?> handleTokenIsExpiredException(TokenIsExpiredException e) {
+    @ExceptionHandler(ExpiredJwtException.class)
+    public ResponseEntity<?> handleTokenIsExpiredException(ExpiredJwtException e) {
         log.error("TokenIsExpiredException");
-        ErrorJson errorJson = new ErrorJson(e, ErrorCode.TokenIsExpiredException);
-        return sendResponse(errorJson, HttpStatus.BAD_REQUEST);
+        ErrorJson errorJson = new ErrorJson(e, ErrorCode.ExpiredJwtException);
+        return sendResponse(errorJson, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(ReIssueBeforeAccessTokenExpiredException.class)

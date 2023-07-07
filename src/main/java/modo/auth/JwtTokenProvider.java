@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.enums.TokenType;
 import modo.exception.authException.ReIssueBeforeAccessTokenExpiredException;
 import modo.exception.authException.RefreshTokenExpiredException;
@@ -34,7 +35,7 @@ public class JwtTokenProvider {
     private final CustomUserDetailService userDetailService;
     private final RedisTokenService redisTokenService;
 
-    private static long accessTokenValidTime = 3600 * 60L;
+    private static long accessTokenValidTime = 60 * 60L;
     private static long refreshTokenValidTime = 30 * 3600 * 60L;
 
     public void setAccessTokenValidTime(Long time) {
@@ -96,14 +97,12 @@ public class JwtTokenProvider {
         throw new TokenIsNullException();
     }
 
-    public void validateToken(String token) throws SignatureException {
+    public void validateToken(String token) throws SignatureException, ExpiredJwtException {
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
 
         if (!claims.getBody().getExpiration().before(new Date())) {
             return;
         }
-
-        throw new TokenIsExpiredException();
     }
 
     private boolean checkRefreshTokenIsExpired(String token) {
@@ -116,20 +115,25 @@ public class JwtTokenProvider {
         return redisTokenService.findAccessToken(usersId) == null;
     }
 
-    public String reIssue(String refreshToken) throws ReIssueBeforeAccessTokenExpiredException, RefreshTokenExpiredException {
+    public UsersLoginResponseDto reIssue(String refreshToken) throws ReIssueBeforeAccessTokenExpiredException, RefreshTokenExpiredException {
         String usersId = getUsersId(refreshToken);
 
         // Request Reissue before AccessToken Expired
         if (!checkAccessTokenIsExpired(refreshToken)) {
-            throw new ReIssueBeforeAccessTokenExpiredException();
+            throw new ReIssueBeforeAccessTokenExpiredException("Access Token is still valid! Can't reIssue accessToken!");
         }
 
         // Request Reissue after RefreshToken Expired
         if (checkRefreshTokenIsExpired(refreshToken)) {
-            throw new RefreshTokenExpiredException();
+            throw new RefreshTokenExpiredException("Refresh Token is Expired! Please re-login and use new refreshToken!");
         }
 
-        return createAccessToken(usersId);
+        String accessToken = createAccessToken(usersId);
+
+        return UsersLoginResponseDto.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
 }

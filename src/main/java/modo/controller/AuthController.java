@@ -18,7 +18,7 @@ public class AuthController extends BaseController {
         return sendResponse(kakaoLoginService.loginOrRegister(code));
     }
 
-    @PostMapping("/v1/auth/reIssue")
+    @PostMapping("/api/v1/auth/reIssue")
     public ResponseEntity<?> reIssue(@RequestHeader("token") String token) throws Exception {
         return sendResponse(jwtTokenProvider.reIssue(token));
     }

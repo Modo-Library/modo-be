@@ -13,7 +13,7 @@ public enum ErrorCode {
     UsernameNotFoundException(1004),
 
     // Auth ErrorCode
-    TokenIsExpiredException(2000),
+    ExpiredJwtException(2000),
     ReIssueBeforeAccessTokenExpiredException(2001),
     TokenIsNullException(2002),
     SignatureException(2003),

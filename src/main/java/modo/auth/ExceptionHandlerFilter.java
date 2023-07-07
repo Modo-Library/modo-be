@@ -1,5 +1,6 @@
 package modo.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -8,7 +9,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.ErrorJson;
 import modo.enums.ErrorCode;
-import modo.exception.authException.TokenIsExpiredException;
 import modo.exception.authException.TokenIsNullException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -23,9 +23,9 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
-        } catch (TokenIsExpiredException e) {
+        } catch (ExpiredJwtException e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.TokenIsExpiredException);
+            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e, ErrorCode.ExpiredJwtException);
         } catch (TokenIsNullException e) {
             e.printStackTrace();
             setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.TokenIsNullException);
