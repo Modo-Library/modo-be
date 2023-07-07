@@ -9,7 +9,6 @@ import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.enums.TokenType;
 import modo.exception.authException.ReIssueBeforeAccessTokenExpiredException;
 import modo.exception.authException.RefreshTokenExpiredException;
-import modo.exception.authException.TokenIsExpiredException;
 import modo.exception.authException.TokenIsNullException;
 import modo.service.CustomUserDetailService;
 import modo.service.RedisTokenService;

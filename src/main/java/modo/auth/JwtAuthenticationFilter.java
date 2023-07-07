@@ -7,7 +7,6 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import modo.exception.authException.TokenIsExpiredException;
 import modo.exception.authException.TokenIsNullException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,7 +21,7 @@ public class JwtAuthenticationFilter extends GenericFilterBean {
     private final JwtTokenProvider jwtTokenProvider;
 
     @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException, TokenIsNullException, TokenIsExpiredException {
+    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException, TokenIsNullException {
 
         // Resolve Token. If token field is null, throw TokenIsNullException
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) request);
