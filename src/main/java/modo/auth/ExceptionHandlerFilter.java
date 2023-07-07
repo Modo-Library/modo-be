@@ -1,5 +1,7 @@
 package modo.auth;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.SignatureException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -7,7 +9,9 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.ErrorJson;
 import modo.enums.ErrorCode;
+import modo.exception.authException.TokenIsNullException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -19,17 +23,27 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         try {
             filterChain.doFilter(request, response);
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            setErrorResponse(HttpStatus.UNAUTHORIZED, response, e, ErrorCode.ExpiredJwtException);
+        } catch (TokenIsNullException e) {
+            e.printStackTrace();
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.TokenIsNullException);
+        } catch (SignatureException e) {
+            e.printStackTrace();
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.SignatureException);
+        } catch (UsernameNotFoundException e) {
+            e.printStackTrace();
+            setErrorResponse(HttpStatus.BAD_REQUEST, response, e, ErrorCode.UsernameNotFoundException);
         } catch (Exception e) {
             e.printStackTrace();
-            setErrorResponse(HttpStatus.ACCEPTED, response, e.getMessage(), ErrorCode.UnknownException);
+            setErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, response, e, ErrorCode.UnknownException);
         }
     }
 
-    public void setErrorResponse(HttpStatus httpStatus, HttpServletResponse response, String message, ErrorCode errorCode) {
-        ErrorJson errorJson = ErrorJson.builder()
-                .message(message)
-                .errorCode(errorCode.getErrorCode())
-                .build();
+    public void setErrorResponse(HttpStatus httpStatus, HttpServletResponse response, Exception e, ErrorCode errorCode) {
+
+        ErrorJson errorJson = new ErrorJson(e, errorCode);
 
         response.setStatus(httpStatus.value());
         response.setContentType("application/json");
@@ -40,5 +54,7 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         } catch (IOException ex) {
             throw new RuntimeException(ex);
         }
+
+        log.warn("* Error raised! message : {}, errorCode : {}, name : {} *", e.getMessage(), errorCode.getErrorCode(), errorCode.name());
     }
 }

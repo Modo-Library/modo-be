@@ -1,0 +1,41 @@
+= Modo BE API Docs
+Powered By Dongwhwan Lee, https://github.com/hwanld
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+[[Auth-ReIssue]]
+== Auth-ReIssue
+
+* ReIssue의 경우 header에다가 refreshToken 값을 넣고 요청하면 됩니다. 사실 새로운 accessToken만 발급하는 로직이지만, 기존 로그인 메소드와 객체를 통일하기 위해서 일부러 header에 첨가한 refreshToken 값까지 같이 리턴합니다.
+
+operation::Auth-ReIssue[snippets='http-request,request-headers,http-response,response-fields']
+
+[[Auth-ExpiredJwtException]]
+== Auth-ExpiredJwtException
+
+* 사용자가 HTTP Header에 첨가한 token(access, refresh 모두) 의 값이 이미 Expired 된 경우에 발생하는 Exception입니다.
+
+operation::Auth-ExpiredJwtException[snippets='http-request,request-headers,path-parameters,http-response,response-fields']
+
+[[Auth-SignatureException]]
+== Auth-SignatureException
+
+* 사용자가 HTTP Header에 첨가한 token(access, refresh 모두) 의 값이 잘못된 경우에 발생하는 Exception입니다.
+* 만약 JwtToken의 양식을 따르지 않는 등의 문제는 (정상적인 로직이라면 일어나지 않아야 하는 문제) 따로 서버에서 컨트롤 하진 않았고, MalformedJwtException이 Raise 될 것 입니다.
+
+operation::Auth-SignatureException[snippets='http-request,request-headers,http-response,response-fields']
+
+[[Auth-ReIssueBeforeAccessTokenExpiredException]]
+== Auth-ReIssueBeforeAccessTokenExpiredException
+
+* 정상적으로 AccessToken을 가진 사용자는 AccessToken으로 계속된 요청을 보내다가 해당 token이 Expired 되었다는 사실을 알 수 있을 것입니다.
+하지만 각 Token의 정확한 Expiration은 오직 서버만 기록하고 서버만 알 수 있습니다.
+* 따라서, 기존의 사용자는 AccessToken이 만료되었다는 응답을 서버로부터 받은 이후에만 ReIssue를 진행할 수 있도록 로직이 진행되도록 해야 합니다.
+* 만약 AccessToken이 Expired되지 않았는데 ReIssue를 요청한다면, RefreshToken이 탈취된 것으로 간주하고 해당 사용자의 Access, Refresh Token 모두를 수동으로 Expire시킵니다.
+(세션으로 치면 세션 종료와 같습니다.)
+
+operation::Auth-ReIssueBeforeAccessTokenExpiredException[snippets='http-request,request-headers,http-response,response-fields']
