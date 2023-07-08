@@ -98,6 +98,10 @@ build {
     dependsOn copyDocument
 }
 
+jar {
+    enabled = false
+}
+
 bootJar {
     dependsOn asciidoctor
     from("${asciidoctor.outputDir}/html5") {
