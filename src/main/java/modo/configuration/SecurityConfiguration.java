@@ -25,8 +25,6 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
-                .csrf().disable()
-                .cors().disable()
                 .authorizeHttpRequests(
                         request -> request
                                 .requestMatchers("/api/v2/**").permitAll()
@@ -34,6 +32,7 @@ public class SecurityConfiguration {
                                 .requestMatchers("/docs/**").permitAll()
                                 .requestMatchers("/favicon.ico").permitAll()
                                 .requestMatchers("/error").permitAll()
+                                .requestMatchers("/profile").permitAll()
                                 .requestMatchers("/api/v1/**").authenticated()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
@@ -51,7 +50,8 @@ public class SecurityConfiguration {
                     .requestMatchers("/oauth/**")
                     .requestMatchers("/docs/**")
                     .requestMatchers("/favicon.ico")
-                    .requestMatchers("/error");
+                    .requestMatchers("/error")
+                    .requestMatchers("/profile");
         };
     }
 }
