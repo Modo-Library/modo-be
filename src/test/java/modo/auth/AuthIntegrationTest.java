@@ -1,7 +1,6 @@
 package modo.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import modo.domain.dto.ErrorJson;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.enums.ErrorCode;
 import modo.repository.AccessTokenRepository;
