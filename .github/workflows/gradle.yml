@@ -48,19 +48,51 @@ jobs:
         run: ./gradlew clean build
 
       - name: Build with gradle
-        run: ./gradlew clean build
+        run: ./gradlew clean build -x test
 
-      - name: Build Docker image
-        run: docker build -t wkazxf/modo .
+      - name: Make Directory for deliver
+        run: mkdir deploy
 
-      - name: Docker Login
-        uses: docker/login-action@v2.2.0
-        with:
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Copy Jar
+        run: cp ./build/libs/*.jar ./deploy/
 
-      - name: Publish Docker Hub
-        run: docker push wkazxf/modo
+      - name: Copy appspec
+        run: cp ./appspec.yml ./deploy/
+
+
+      - name: Copy shell
+        run: cp ./scripts/* ./deploy/
+
+      - name: Grant execute permission for scripts
+        run: chmod +x ./scripts/*
+
+
+      - name: Make zip file
+        run: zip -r -qq -j ./modo-deploy.zip ./deploy/
+
+
+      - name: Deliver to AWS S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          --acl private \
+          ./modo-deploy.zip s3://modo-deploy/
+
+
+#      - name: Deploy
+#        env:
+#          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#        run: |
+#          aws deploy create-deployment \
+#          --application-name $CODEDEPLOY_APPLICATION_NAME \
+#          --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+#          --file-exists-behavior OVERWRITE \
+#          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=2ntrip-api-refactor-deploy.zip \
+#          --region ap-northeast-2
 
 
 
