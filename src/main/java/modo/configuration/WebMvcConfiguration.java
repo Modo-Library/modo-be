@@ -9,7 +9,7 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://*.modolib.site", "https://localhost:5000", "https://localhost:5001", "https://localhost:5002")
+                .allowedOrigins("https://host.modolib.site", "https://auth.modolib.site", "https://books.modolib.site", "http://localhost:5000", "http://localhost:5001", "http://localhost:5002")
                 .allowedMethods("PUT", "POST", "GET", "DELETE", "OPTIONS");
     }
 }
