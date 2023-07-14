@@ -14,7 +14,7 @@ on:
     branches: [ "main" ]
 
 env:
-  S3_BUCKET_NAME: 2ntrip-backend-refactor-deploy
+  S3_BUCKET_NAME: modo-deploy
   CODEDEPLOY_APPLICATION_NAME: modo-deploy
   DEPLOYMENT_GROUP_NAME: modo-deploy
 
