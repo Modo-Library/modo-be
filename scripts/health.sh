@@ -12,14 +12,14 @@ IDLE_PORT=$(find_idle_port)
 
 echo "> Health Check Start!"
 echo "> IDLE_PORT: $IDLE_PORT"
-echo "> curl -s https://2ntrip.link/api/v2/profile "
+echo "> curl -s https://modolib.com/profile "
 
 sleep 10
 
 for RETRY_COUNT in {1..10}
 do
 
-  RESPONSE=$(curl -s https://2ntrip.link/api/v2/profile)
+  RESPONSE=$(curl -s https://modolib.com/profile)
   UP_COUNT=$(echo ${RESPONSE} | grep 'real' | wc -l)
 
   if [ ${UP_COUNT} -ge 1 ]
