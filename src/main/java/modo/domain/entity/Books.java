@@ -15,6 +15,7 @@ import java.util.List;
 @Setter
 public class Books {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long booksId;
 
     @Column(nullable = false)

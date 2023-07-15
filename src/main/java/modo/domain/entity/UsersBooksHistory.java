@@ -1,10 +1,7 @@
 package modo.domain.entity;
 
 import io.lettuce.core.dynamic.annotation.Key;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -15,6 +12,7 @@ import lombok.*;
 @Builder
 public class UsersBooksHistory {
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long historyId;
 
     private Long status;
