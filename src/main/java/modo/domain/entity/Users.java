@@ -42,6 +42,9 @@ public class Users implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersReview> usersReviewList = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Books> booksList = new ArrayList<>();
+
     public void setUsersHistory(UsersHistory usersHistory) {
         this.usersHistory = usersHistory;
     }
