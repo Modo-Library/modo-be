@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -42,5 +44,8 @@ public class Books {
     @ManyToOne
     @JoinColumn(name = "usersId")
     private Users owner;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UsersBooksHistory> usersBooksHistoryList = new ArrayList<>();
 
 }
