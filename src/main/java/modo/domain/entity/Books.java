@@ -8,9 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Getter
 @Setter
 public class Books {
@@ -42,6 +40,18 @@ public class Books {
     @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
+    @Builder
+    public Books(String name, Long price, Long status, LocalDateTime deadline, String description, String imgUrl) {
+        this.name = name;
+        this.price = price;
+        this.status = status;
+        this.deadline = deadline;
+        this.description = description;
+        this.imgUrl = imgUrl;
+        this.createdAt = LocalDateTime.now();
+        this.modifiedAt = LocalDateTime.now();
+    }
+
     @ManyToOne
     @JoinColumn(name = "usersId")
     private Users owner;
@@ -50,6 +60,6 @@ public class Books {
     private List<UsersBooksHistory> usersBooksHistoryList = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likeList = new ArrayList<>();
+    private List<Likes> likesList = new ArrayList<>();
 
 }

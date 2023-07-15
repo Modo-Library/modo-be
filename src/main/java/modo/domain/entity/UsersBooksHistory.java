@@ -5,11 +5,9 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
-@Builder
 public class UsersBooksHistory {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,4 +22,11 @@ public class UsersBooksHistory {
     @ManyToOne
     @JoinColumn(name = "booksId")
     private Books books;
+
+    @Builder
+    public UsersBooksHistory(Long status, Users users, Books books) {
+        this.status = status;
+        this.users = users;
+        this.books = books;
+    }
 }

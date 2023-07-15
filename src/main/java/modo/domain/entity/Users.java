@@ -49,7 +49,7 @@ public class Users implements UserDetails {
     private List<UsersBooksHistory> usersBooksHistoryList = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Like> likeList = new ArrayList<>();
+    private List<Likes> likesList = new ArrayList<>();
 
     public void setUsersHistory(UsersHistory usersHistory) {
         this.usersHistory = usersHistory;
