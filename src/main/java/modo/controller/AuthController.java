@@ -22,4 +22,9 @@ public class AuthController extends BaseController {
     public ResponseEntity<?> reIssue(@RequestHeader("token") String token) throws Exception {
         return sendResponse(jwtTokenProvider.reIssue(token));
     }
+
+    @PostMapping("/oauth/kakao/app")
+    public ResponseEntity<?> kakaoLoginForApp(@RequestParam("token") String token) throws Exception {
+        return sendResponse(kakaoLoginService.getKakaoUserInfo(token));
+    }
 }
