@@ -30,6 +30,11 @@ public class AuthController extends BaseController {
         return sendResponse(kakaoLoginService.getKakaoUserInfo(token));
     }
 
+    @PostMapping("/oauth/apple")
+    public ResponseEntity<?> appleLogin(@RequestParam("code") String code) throws Exception {
+        return sendResponse(appleLoginService.loginOrRegister(code));
+    }
+
     @PostMapping("/oauth/apple/app")
     public ResponseEntity<?> appleLoginForApp(@RequestParam("idToken") String token) throws Exception {
         return sendResponse(appleLoginService.getEmailWithUsingIdToken(token));

@@ -53,7 +53,7 @@ public class AppleLoginService {
     private RestTemplate restTemplate = new RestTemplate();
     private final UsersService usersService;
 
-    public Object appleLogin() throws Exception {
+    public UsersLoginResponseDto loginOrRegister(String code) throws Exception {
 
         log.info("Try to get information in appleKeyId");
         InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyPath);
@@ -110,38 +110,7 @@ public class AppleLoginService {
         log.info("Success to get idToken with apple server with code value");
         log.info("IdToken : {}", idToken);
 
-        log.info("Try to get Email with using IdToken : {}", idToken);
-
-        UriComponents uri_key = UriComponentsBuilder.fromHttpUrl(appleUrl + "/auth/keys")
-                .build(false);
-
-        ResponseEntity<Map> response_key = restTemplate.exchange(uri_key.toUriString(), HttpMethod.GET, entity, Map.class);
-        List<Map<String, Object>> keys = (List<Map<String, Object>>) response_key.getBody().get("keys");
-
-        // 가져온 public key 중 idToken을 암호화한 key가 있는지 확인
-        SignedJWT signedJWT = SignedJWT.parse(idToken);
-        for (Map<String, Object> key : keys) {
-            RSAKey rsaKey = (RSAKey) JWK.parse(new ObjectMapper().writeValueAsString(key));
-            RSAPublicKey rsaPublicKey = rsaKey.toRSAPublicKey();
-            JWSVerifier jwsVerifier = new RSASSAVerifier(rsaPublicKey);
-
-            // idToken을 암호화한 key인 경우
-            if (signedJWT.verify(jwsVerifier)) {
-                // jwt를 .으로 나눴을때 가운데에 있는 payload 확인
-                String payload = idToken.split("[.]")[1];
-                // public key로 idToken 복호화
-                Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
-                // 사용자 이메일 정보 추출
-                String email = payloadMap.get("email").toString();
-
-                // 결과 반환
-                return ResponseEntity.ok(email);
-            }
-        }
-
-        // 결과 반환
-        return null;
-
+        return getEmailWithUsingIdToken(idToken);
     }
 
     public UsersLoginResponseDto getEmailWithUsingIdToken(String idToken) throws JsonProcessingException, JOSEException, ParseException {
