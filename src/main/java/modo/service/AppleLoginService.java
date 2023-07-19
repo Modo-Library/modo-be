@@ -1,160 +1,186 @@
-//package modo.service;
-//
-//import com.fasterxml.jackson.databind.ObjectMapper;
-//import com.nimbusds.jwt.SignedJWT;
-//import io.jsonwebtoken.Jwts;
-//import io.jsonwebtoken.SignatureAlgorithm;
-//import lombok.RequiredArgsConstructor;
-//import lombok.extern.log4j.Log4j2;
-//import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
-//import org.bouncycastle.openssl.PEMParser;
-//import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
-//import org.springframework.beans.factory.annotation.Value;
-//import org.springframework.context.annotation.PropertySource;
-//import org.springframework.stereotype.Service;
-//
-//import java.io.*;
-//import java.security.PrivateKey;
-//import java.util.Date;
-//import java.util.HashMap;
-//import java.util.Map;
-//
-//@RequiredArgsConstructor
-//@Log4j2
-//@Service
-//@PropertySource("classpath:application.properties")
-//public class AppleLoginService {
-//
-//    @Value("${apple.team.id}")
-//    private String teamId;
-//
-//    @Value("${apple.client.id}")
-//    private String clientId;
-//
-//    @Value("${apple.key.id}")
-//    private String keyId;
-//
-//    @Value("${apple.key.path}")
-//    private String keyPath;
-//
-//    private String appleUrl = "https://appleid.apple.com";
-//
-//    private static ObjectMapper objectMapper = new ObjectMapper();
-//
-//    public Object appleLogin() throws Exception {
-//        /**
-//         * appleKeyId를 이용하여 privateKey 생성
-//         */
-//
-//        // appleKeyId에 담겨있는 정보 가져오기
-//        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyPath);
-//        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-//        String readLine = null;
-//        StringBuilder stringBuilder = new StringBuilder();
-//        while ((readLine = bufferedReader.readLine()) != null) {
-//            stringBuilder.append(readLine);
-//            stringBuilder.append("\n");
-//        }
-//        String keyPath = stringBuilder.toString();
-//
-//        // privateKey 생성하기
-//        Reader reader = new StringReader(keyPath);
-//        PEMParser pemParser = new PEMParser(reader);
-//        JcaPEMKeyConverter jcaPEMKeyConverter = new JcaPEMKeyConverter();
-//        PrivateKeyInfo privateKeyInfo = (PrivateKeyInfo) pemParser.readObject();
-//        PrivateKey privateKey = jcaPEMKeyConverter.getPrivateKey(privateKeyInfo);
-//
-//        /**
-//         * privateKey를 이용하여 clientSecretKey 생성
-//         */
-//
-//        // headerParams 적재
-//        Map<String, Object> headerParamsMap = new HashMap<>();
-//        headerParamsMap.put("kid", keyId);
-//        headerParamsMap.put("alg", "ES256");
-//
-//        // clientSecretKey 생성
-//        String clientSecretKey = Jwts
-//                .builder()
-//                .setHeaderParams(headerParamsMap)
-//                .setIssuer(teamId)
-//                .setIssuedAt(new Date(System.currentTimeMillis()))
-//                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30)) // 만료 시간 (30초)
-//                .setAudience(appleUrl)
-//                .setSubject(clientId)
-//                .signWith(SignatureAlgorithm.ES256, privateKey)
-//                .compact();
-//
-//        /**
-//         * code값을 이용하여 token정보 가져오기
-//         */
-//
-//        // webClient 설정
-////        WebClient webClient =
-////                WebClient
-////                        .builder()
-////                        .baseUrl(appleUrl)
-////                        .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-////                        .build();
-//
-//        // token api 호출
-////        Map<String, Object> tokenResponse =
-////                webClient
-////                        .post()
-////                        .uri(uriBuilder -> uriBuilder
-////                                .path("/auth/token")
-////                                .queryParam("grant_type", "authorization_code")
-////                                .queryParam("client_id", appleKey)
-////                                .queryParam("client_secret", clientSecretKey)
-////                                .queryParam("code", appleLogin.getCode())
-////                                .build())
-////                        .retrieve()
-////                        .bodyToMono(Map.class)
-////                        .block();
-//
-////        String idToken = (String) tokenResponse.get("id_token");
-//
-//        /**
-//         * apple public key로 idToken을 복호화하여 사용자 이메일 정보 확인하기
-//         */
-//
-//        // key api 호출
-//        Map<String, Object> keyReponse =
-//                webClient
-//                        .get()
-//                        .uri(uriBuilder -> uriBuilder
-//                                .path("/auth/keys")
-//                                .build())
-//                        .retrieve()
-//                        .bodyToMono(Map.class)
-//                        .block();
-//
-//        List<Map<String, Object>> keys = (List<Map<String, Object>>) keyReponse.get("keys");
-//
-//        // 가져온 public key 중 idToken을 암호화한 key가 있는지 확인
-//        SignedJWT signedJWT = SignedJWT.parse(idToken);
-//        for (Map<String, Object> key : keys) {
-//            RSAKey rsaKey = (RSAKey) JWK.parse(new ObjectMapper().writeValueAsString(key));
-//            RSAPublicKey rsaPublicKey = rsaKey.toRSAPublicKey();
-//            JWSVerifier jwsVerifier = new RSASSAVerifier(rsaPublicKey);
-//
-//            // idToken을 암호화한 key인 경우
-//            if (signedJWT.verify(jwsVerifier)) {
-//                // jwt를 .으로 나눴을때 가운데에 있는 payload 확인
-//                String payload = idToken.split("[.]")[1];
-//                // public key로 idToken 복호화
-//                Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
-//                // 사용자 이메일 정보 추출
-//                String email = payloadMap.get("email").toString();
-//
-//                // 결과 반환
-//                return ResponseEntity.ok(email);
-//            }
-//        }
-//
-//        // 결과 반환
-//        return null;
-//
-//    }
-//
-//}
+package modo.service;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jwt.SignedJWT;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import modo.domain.dto.users.Users.UsersLoginResponseDto;
+import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
+import org.bouncycastle.openssl.PEMParser;
+import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.*;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.io.*;
+import java.security.PrivateKey;
+import java.security.interfaces.RSAPublicKey;
+import java.text.ParseException;
+import java.util.*;
+
+@RequiredArgsConstructor
+@Log4j2
+@Service
+@PropertySource("classpath:application.properties")
+public class AppleLoginService {
+
+    @Value("${apple.team.id}")
+    private String teamId;
+
+    @Value("${apple.client.id}")
+    private String clientId;
+
+    @Value("${apple.key.id}")
+    private String keyId;
+
+    @Value("${apple.key.path}")
+    private String keyPath;
+
+    private String appleUrl = "https://appleid.apple.com";
+    private static ObjectMapper objectMapper = new ObjectMapper();
+    private RestTemplate restTemplate = new RestTemplate();
+    private final UsersService usersService;
+
+    public Object appleLogin() throws Exception {
+
+        log.info("Try to get information in appleKeyId");
+        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyPath);
+        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+        String readLine = null;
+        StringBuilder stringBuilder = new StringBuilder();
+        while ((readLine = bufferedReader.readLine()) != null) {
+            stringBuilder.append(readLine);
+            stringBuilder.append("\n");
+        }
+        String keyPath = stringBuilder.toString();
+        log.info("Success to get information in appleKeyId!");
+
+        log.info("Try to make privateKey");
+        Reader reader = new StringReader(keyPath);
+        PEMParser pemParser = new PEMParser(reader);
+        JcaPEMKeyConverter jcaPEMKeyConverter = new JcaPEMKeyConverter();
+        PrivateKeyInfo privateKeyInfo = (PrivateKeyInfo) pemParser.readObject();
+        PrivateKey privateKey = jcaPEMKeyConverter.getPrivateKey(privateKeyInfo);
+        log.info("Success to make privateKey");
+
+        Map<String, Object> headerParamsMap = new HashMap<>();
+        headerParamsMap.put("kid", keyId);
+        headerParamsMap.put("alg", "ES256");
+
+        log.info("Try to create clientSecretKey");
+        String clientSecretKey = Jwts
+                .builder()
+                .setHeaderParams(headerParamsMap)
+                .setIssuer(teamId)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 30)) // 만료 시간 (30초)
+                .setAudience(appleUrl)
+                .setSubject(clientId)
+                .signWith(SignatureAlgorithm.ES256, privateKey)
+                .compact();
+        log.info("Success to create clientSecretKey");
+
+        log.info("Try to get idToken with apple server with code value");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        UriComponents uri = UriComponentsBuilder.fromHttpUrl(appleUrl + "/auth/token")
+                .queryParam("grant_type", "authorization_code")
+                .queryParam("client_id", clientId)
+                .queryParam("client_secret", clientSecretKey)
+//               TODO(appleLogin.getCode() Front-end와 상의해서 맞추기)
+//              .queryParam("code", appleLogin.getCode())
+                .build(false);
+
+        ResponseEntity<Map> response = restTemplate.exchange(uri.toUriString(), HttpMethod.POST, entity, Map.class);
+        String idToken = response.getBody().get("idToken").toString();
+        log.info("Success to get idToken with apple server with code value");
+        log.info("IdToken : {}", idToken);
+
+        log.info("Try to get Email with using IdToken : {}", idToken);
+
+        UriComponents uri_key = UriComponentsBuilder.fromHttpUrl(appleUrl + "/auth/keys")
+                .build(false);
+
+        ResponseEntity<Map> response_key = restTemplate.exchange(uri_key.toUriString(), HttpMethod.GET, entity, Map.class);
+        List<Map<String, Object>> keys = (List<Map<String, Object>>) response_key.getBody().get("keys");
+
+        // 가져온 public key 중 idToken을 암호화한 key가 있는지 확인
+        SignedJWT signedJWT = SignedJWT.parse(idToken);
+        for (Map<String, Object> key : keys) {
+            RSAKey rsaKey = (RSAKey) JWK.parse(new ObjectMapper().writeValueAsString(key));
+            RSAPublicKey rsaPublicKey = rsaKey.toRSAPublicKey();
+            JWSVerifier jwsVerifier = new RSASSAVerifier(rsaPublicKey);
+
+            // idToken을 암호화한 key인 경우
+            if (signedJWT.verify(jwsVerifier)) {
+                // jwt를 .으로 나눴을때 가운데에 있는 payload 확인
+                String payload = idToken.split("[.]")[1];
+                // public key로 idToken 복호화
+                Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
+                // 사용자 이메일 정보 추출
+                String email = payloadMap.get("email").toString();
+
+                // 결과 반환
+                return ResponseEntity.ok(email);
+            }
+        }
+
+        // 결과 반환
+        return null;
+
+    }
+
+    public UsersLoginResponseDto getEmailWithUsingIdToken(String idToken) throws JsonProcessingException, JOSEException, ParseException {
+        log.info("Try to get Email with using IdToken : {}", idToken);
+
+        log.info("Get Keys From Apple Server");
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.valueOf(MediaType.APPLICATION_JSON_VALUE));
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+        UriComponents uri_key = UriComponentsBuilder.fromHttpUrl(appleUrl + "/auth/keys")
+                .build(false);
+
+        ResponseEntity<Map> response_key = restTemplate.exchange(uri_key.toUriString(), HttpMethod.GET, entity, Map.class);
+        List<Map<String, Object>> keys = (List<Map<String, Object>>) response_key.getBody().get("keys");
+
+        log.info("Find Keys From Apple Server");
+        // 가져온 public key 중 idToken을 암호화한 key가 있는지 확인
+        SignedJWT signedJWT = SignedJWT.parse(idToken);
+        for (Map<String, Object> key : keys) {
+            RSAKey rsaKey = (RSAKey) JWK.parse(new ObjectMapper().writeValueAsString(key));
+            RSAPublicKey rsaPublicKey = rsaKey.toRSAPublicKey();
+            JWSVerifier jwsVerifier = new RSASSAVerifier(rsaPublicKey);
+
+            // idToken을 암호화한 key인 경우
+            if (signedJWT.verify(jwsVerifier)) {
+                // jwt를 .으로 나눴을때 가운데에 있는 payload 확인
+                String payload = idToken.split("[.]")[1];
+                // public key로 idToken 복호화
+                Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
+                // 사용자 이메일 정보 추출
+                String email = payloadMap.get("email").toString();
+
+                // 결과 반환
+                return usersService.login(email);
+            }
+        }
+        // 결과 반환
+        return null;
+    }
+
+}
