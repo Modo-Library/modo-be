@@ -107,7 +107,8 @@ public class AuthIntegrationTest {
                         ),
                         responseFields(
                                 fieldWithPath("accessToken").description("New access token value").type(JsonFieldType.STRING),
-                                fieldWithPath("refreshToken").description("Existing refresh token value").type(JsonFieldType.STRING)
+                                fieldWithPath("refreshToken").description("Existing refresh token value").type(JsonFieldType.STRING),
+                                fieldWithPath("usersId").description("Users' Id").type(JsonFieldType.STRING)
                         )))
                 .andDo(print())
                 .andReturn();
