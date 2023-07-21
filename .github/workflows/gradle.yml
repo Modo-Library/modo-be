@@ -13,6 +13,8 @@ on:
   pull_request:
     branches: [ "main" ]
 
+permissions: write-all
+
 env:
   S3_BUCKET_NAME: modo-deploy
   CODEDEPLOY_APPLICATION_NAME: modo-deploy
