@@ -5,6 +5,12 @@ plugins {
     id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
+apply plugin: 'java'
+
+test {
+    testLogging.showStandardStreams = true
+}
+
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
@@ -73,6 +79,9 @@ dependencies {
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '9.30.1'
     implementation group: 'org.bouncycastle', name: 'bcpkix-jdk18on', version: '1.72'
 
+    // AWS S3
+    implementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.103'
+    testImplementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.103'
 }
 
 ext {
