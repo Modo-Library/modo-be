@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.repository.AccessTokenRepository;
+import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,9 @@ public class BooksIntegrationTest {
     private UsersRepository usersRepository;
 
     @Autowired
+    private UsersHistoryRepository usersHistoryRepository;
+
+    @Autowired
     private AccessTokenRepository accessTokenRepository;
 
     @Autowired
@@ -60,6 +64,7 @@ public class BooksIntegrationTest {
 
     @BeforeEach
     void tearDown() {
+        usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
         accessTokenRepository.deleteAll();
     }

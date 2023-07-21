@@ -31,7 +31,6 @@ public class S3Service {
 //      keyName - A key name that represents a text file.
 
     public String createPreUrl(String keyName) throws IOException {
-        log.info("createPreUrl in BooksController is Called!");
 
         ProfileCredentialsProvider credentialsProvider = ProfileCredentialsProvider.create();
         Region region = Region.AP_NORTHEAST_2;
