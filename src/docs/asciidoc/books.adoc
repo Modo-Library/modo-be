@@ -1,0 +1,16 @@
+= Modo BE API Docs
+Powered By Dongwhwan Lee, https://github.com/hwanld
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+[[Books-createPreUrl]]
+== Books-createPreUrl
+
+* Books Upload 시에 사진을 업로드 하기 위한 preSignedURL을 AWS S3로부터 발급받기 위한 API입니다.
+* keyName으로 URL에 식별자를 주면 해당 식별자를 사용해서 preSignedURL을 발급합니다. keyName은 Upload하는 파일의 이름과는 무관합니다.
+
+operation::Books-createPreUrl[snippets='http-request,path-parameters,http-response']
