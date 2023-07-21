@@ -13,6 +13,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.users.Users.UsersLoginResponseDto;
+import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -113,7 +114,7 @@ public class AppleLoginService {
         return getEmailWithUsingIdToken(idToken);
     }
 
-    public UsersLoginResponseDto getEmailWithUsingIdToken(String idToken) throws JsonProcessingException, JOSEException, ParseException {
+    public UsersLoginResponseDto getEmailWithUsingIdToken(String idToken) throws Exception {
         log.info("Try to get Email with using IdToken : {}", idToken);
 
         log.info("Get Keys From Apple Server");
@@ -143,13 +144,33 @@ public class AppleLoginService {
                 Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
                 // 사용자 이메일 정보 추출
                 String email = payloadMap.get("email").toString();
+//                String nickname = payloadMap.get("fullname").toString();
+                log.info("payloadMap is : {}", payloadMap);
 
                 // 결과 반환
-                return usersService.login(email);
+                return registerAndLogin("nickname", email);
+//                return registerAndLogin(nickname, email);
             }
         }
         // 결과 반환
         return null;
     }
+
+    public UsersLoginResponseDto registerAndLogin(String nickname, String email) throws Exception {
+        if (!usersService.isExistsByUsersId(email)) {
+            UsersSaveRequestDto requestDto = UsersSaveRequestDto.builder()
+                    .usersId(email)
+                    .nickname(nickname)
+                    .latitude(latitude_ajou)
+                    .longitude(longitude_ajou)
+                    .build();
+
+            usersService.save(requestDto);
+        }
+        return usersService.login(email);
+    }
+
+    private static final double latitude_ajou = 37.28016;
+    private static final double longitude_ajou = 127.043705;
 
 }
