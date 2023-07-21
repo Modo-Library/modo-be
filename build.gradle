@@ -5,6 +5,12 @@ plugins {
     id "org.asciidoctor.jvm.convert" version "3.3.2"
 }
 
+apply plugin: 'java'
+
+test {
+    testLogging.showStandardStreams = true
+}
+
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
 
