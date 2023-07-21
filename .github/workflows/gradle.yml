@@ -40,7 +40,7 @@ jobs:
         uses: supercharge/redis-github-action@1.5.0
 
       - name: Create Properties files
-        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties
+        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; touch ~/.aws/config
 
       - name: Load Application Properties
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
@@ -50,6 +50,9 @@ jobs:
 
       - name: Load Application Real2 Properties
         run: echo "${{ secrets.APPLICATION_REAL2_PROPERTIES }}" > ./src/main/resources/application-real2.properties
+
+      - name: Load AWS SDK Key file
+        run: echo "${{ secrets.AWS_SDK_KEY }}" > ~/.aws/config
 
       - name: Build with gradle
         run: ./gradlew clean build
