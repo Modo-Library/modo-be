@@ -40,7 +40,7 @@ jobs:
         uses: supercharge/redis-github-action@1.5.0
 
       - name: Create Properties files
-        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; touch ~/.aws/config
+        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config
 
       - name: Load Application Properties
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
