@@ -132,6 +132,7 @@ public class JwtTokenProvider {
         return UsersLoginResponseDto.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .usersId(usersId)
                 .build();
     }
 

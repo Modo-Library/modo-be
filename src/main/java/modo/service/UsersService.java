@@ -50,6 +50,7 @@ public class UsersService {
         return UsersLoginResponseDto.builder()
                 .accessToken(jwtTokenProvider.createAccessToken(usersId))
                 .refreshToken(jwtTokenProvider.createRefreshToken(usersId))
+                .usersId(usersId)
                 .build();
     }
 

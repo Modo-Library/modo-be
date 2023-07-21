@@ -53,6 +53,7 @@ public class AuthExceptionHandler extends BaseController {
     public ResponseEntity<?> handleUnknownException(Exception e) {
         e.printStackTrace();
         log.error("UnknownException");
+        e.printStackTrace();
         ErrorJson errorJson = new ErrorJson(e, ErrorCode.UnknownException);
         return sendResponse(errorJson, HttpStatus.INTERNAL_SERVER_ERROR);
     }
