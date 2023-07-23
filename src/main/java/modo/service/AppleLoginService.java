@@ -143,13 +143,12 @@ public class AppleLoginService {
                 // public key로 idToken 복호화
                 Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
                 // 사용자 이메일 정보 추출
-                String email = payloadMap.get("email").toString();
-//                String nickname = payloadMap.get("fullname").toString();
                 log.info("payloadMap is : {}", payloadMap);
+                String email = payloadMap.get("email").toString();
+//                String sub = payloadMap.get("sub").toString();
 
                 // 결과 반환
                 return registerAndLogin("nickname", email);
-//                return registerAndLogin(nickname, email);
             }
         }
         // 결과 반환
