@@ -74,7 +74,7 @@ public class BooksIntegrationTest {
         saveNewTestUsersAndCreateNewToken();
         final String testKeyName = "testKeyName";
 
-        mockMvc.perform(post("/api/v1/books/{keyName}", testKeyName)
+        mockMvc.perform(post("/api/v1/books/preUrl/{keyName}", testKeyName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("token", accessToken)
                 )

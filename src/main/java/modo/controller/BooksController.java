@@ -14,7 +14,7 @@ import java.io.IOException;
 public class BooksController extends BaseController {
     private final S3Service s3Service;
 
-    @PostMapping("/api/v1/books/{keyName}")
+    @PostMapping("/api/v1/books/preUrl/{keyName}")
     public ResponseEntity<?> createPreUrl(@PathVariable String keyName) throws IOException {
         return sendResponse(s3Service.createPreUrl(keyName));
     }
