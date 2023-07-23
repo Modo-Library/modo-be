@@ -2,6 +2,7 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import modo.enums.BooksStatus;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,9 +24,9 @@ public class Books {
     private Long price;
 
     @Column(nullable = false)
-    private Long status;
+    private BooksStatus status;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private LocalDateTime deadline;
 
     @Column(nullable = true)
@@ -41,11 +42,10 @@ public class Books {
     private LocalDateTime modifiedAt;
 
     @Builder
-    public Books(String name, Long price, Long status, LocalDateTime deadline, String description, String imgUrl) {
+    public Books(String name, Long price, BooksStatus status, String description, String imgUrl) {
         this.name = name;
         this.price = price;
         this.status = status;
-        this.deadline = deadline;
         this.description = description;
         this.imgUrl = imgUrl;
         this.createdAt = LocalDateTime.now();
