@@ -2,6 +2,7 @@ package modo.Books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.books.BooksResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
@@ -21,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -28,6 +30,8 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -115,6 +119,28 @@ public class BooksIntegrationTest {
                         .header("token", accessToken)
                 )
                 .andExpect(status().isOk())
+                .andDo(document("Books-save",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("Saving book's name"),
+                                fieldWithPath("price").description("Saving book's price"),
+                                fieldWithPath("status").description("Saving book's status"),
+                                fieldWithPath("description").description(""),
+                                fieldWithPath("imgUrl").description("Saving user's longitude. Type : double"),
+                                fieldWithPath("usersId").description("Saving user's longitude. Type : double")
+                        ),
+                        responseFields(
+                                fieldWithPath("booksId").description("Saving user's usersId"),
+                                fieldWithPath("name").description("Saving user's nickname"),
+                                fieldWithPath("price").description("Saving user's average reviewScore. Type : double. Default :0.0"),
+                                fieldWithPath("status").description("Saving user's total reviewCount. Default : 0L"),
+                                fieldWithPath("deadline").description("Saving user's history : total rentingCount. Default : 0L"),
+                                fieldWithPath("description").description("Saving user's history : total returningCount. Default : 0L"),
+                                fieldWithPath("imgUrl").description("Saving user's history : total buyCount. Default : 0L"),
+                                fieldWithPath("createdAt").description("Saving user's history : total sellCount. Default : 0L"),
+                                fieldWithPath("modifiedAt").description("Saving user's history : total sellCount. Default : 0L")
+                        )))
                 .andDo(print());
     }
 
