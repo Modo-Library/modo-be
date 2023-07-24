@@ -10,6 +10,8 @@ public class WebMvcConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOrigins("https://host.modolib.site", "https://auth.modolib.site", "https://books.modolib.site", "http://localhost:5000", "http://localhost:5001", "http://localhost:5002")
-                .allowedMethods("PUT", "POST", "GET", "DELETE", "OPTIONS");
+                .allowedMethods("PUT", "POST", "GET", "DELETE", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
     }
 }
