@@ -25,7 +25,7 @@ public class BooksResponseDto {
         this.name = books.getName();
         this.price = books.getPrice();
         this.status = books.getStatus().toString();
-        this.deadline = books.getDeadline().toString();
+        if (deadline != null) this.deadline = books.getDeadline().toString();
         this.description = books.getDescription();
         this.imgUrl = books.getImgUrl();
         this.createdAt = books.getCreatedAt().toString();

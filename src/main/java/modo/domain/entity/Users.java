@@ -42,6 +42,7 @@ public class Users implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersReview> usersReviewList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Books> booksList = new ArrayList<>();
 
@@ -77,6 +78,10 @@ public class Users implements UserDetails {
 
     public void updateLocation(double latitude, double longitude) {
         setLocation(GeomUtil.createPoint(latitude, longitude));
+    }
+
+    public void addBooks(Books books) {
+        this.booksList.add(books);
     }
 
     @Override

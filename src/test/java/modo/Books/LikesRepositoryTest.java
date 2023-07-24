@@ -3,6 +3,7 @@ package modo.Books;
 import modo.domain.entity.Books;
 import modo.domain.entity.Likes;
 import modo.domain.entity.Users;
+import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
 import modo.repository.LikesRepository;
 import modo.repository.UsersRepository;
@@ -65,7 +66,7 @@ public class LikesRepositoryTest {
     // Test Books Information : static final variable
     static final String testName = "testName";
     static final Long testPrice = 1000L;
-    static final Long testStatus = 1L;
+    static final BooksStatus testStatus = BooksStatus.AVAILABLE;
     static final LocalDateTime testDeadline = LocalDateTime.now().plusDays(7L);
     static final String testDescription = "testDescription";
     static final String testImgUrl = "testImgUrl";
@@ -88,7 +89,6 @@ public class LikesRepositoryTest {
                 .price(testPrice)
                 .status(testStatus)
                 .description(testDescription)
-                .deadline(testDeadline)
                 .imgUrl(testImgUrl)
                 .build();
 

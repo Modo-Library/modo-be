@@ -3,6 +3,8 @@ package modo.domain.entity;
 import io.lettuce.core.dynamic.annotation.Key;
 import jakarta.persistence.*;
 import lombok.*;
+import modo.enums.BooksStatus;
+import modo.service.BooksService;
 
 @Entity
 @NoArgsConstructor
@@ -13,7 +15,7 @@ public class UsersBooksHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long historyId;
 
-    private Long status;
+    private BooksStatus status;
 
     @ManyToOne
     @JoinColumn(name = "usersId")
@@ -24,7 +26,7 @@ public class UsersBooksHistory {
     private Books books;
 
     @Builder
-    public UsersBooksHistory(Long status, Users users, Books books) {
+    public UsersBooksHistory(BooksStatus status, Users users, Books books) {
         this.status = status;
         this.users = users;
         this.books = books;

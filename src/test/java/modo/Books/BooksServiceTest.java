@@ -8,7 +8,6 @@ import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
 import modo.repository.UsersRepository;
 import modo.service.BooksService;
-import modo.service.UsersService;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,9 +28,6 @@ public class BooksServiceTest {
     BooksRepository booksRepository;
 
     @Autowired
-    UsersService usersService;
-
-    @Autowired
     UsersRepository usersRepository;
 
     BooksService booksService;
@@ -43,7 +39,7 @@ public class BooksServiceTest {
 
     @BeforeEach
     void injectRepositoryToUsersService() {
-        booksService = new BooksService(booksRepository);
+        booksService = new BooksService(booksRepository, usersRepository);
     }
 
     @Test
@@ -55,9 +51,10 @@ public class BooksServiceTest {
                 .status(testStatus.toString())
                 .description(testDescription)
                 .imgUrl(testImgUrl)
+                .usersId(testUsersId)
                 .build();
 
-        usersService.save(testUsersSaveRequestDto);
+        usersRepository.save(testUsersSaveRequestDto.toEntity());
 
         //when
         booksService.save(requestDto);
@@ -73,7 +70,7 @@ public class BooksServiceTest {
         assertThat(targetBooks.getImgUrl()).isEqualTo(testImgUrl);
         assertThat(targetBooks.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(targetBooks.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(targetBooks.getDescription()).isNull();
+        assertThat(targetBooks.getDeadline()).isNull();
 
         assertThat(targetUsers.getBooksList().size()).isEqualTo(1);
         assertThat(targetUsers.getBooksList().get(0).getName()).isEqualTo(testName);

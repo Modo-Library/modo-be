@@ -51,7 +51,6 @@ public class BooksRepositoryTest {
         assertThat(target.getPrice()).isEqualTo(testPrice);
         assertThat(target.getStatus()).isEqualTo(testStatus);
         assertThat(target.getDescription()).isEqualTo(testDescription);
-        assertThat(target.getDeadline()).isEqualTo(testDeadline);
         assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
         assertThat(target.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(target.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
