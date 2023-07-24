@@ -1,12 +1,18 @@
 package modo.Books;
 
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
+import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
+import modo.repository.UsersRepository;
 import modo.service.BooksService;
+import modo.service.UsersService;
+import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -21,6 +27,12 @@ public class BooksServiceTest {
 
     @Autowired
     BooksRepository booksRepository;
+
+    @Autowired
+    UsersService usersService;
+
+    @Autowired
+    UsersRepository usersRepository;
 
     BooksService booksService;
 
@@ -45,19 +57,26 @@ public class BooksServiceTest {
                 .imgUrl(testImgUrl)
                 .build();
 
+        usersService.save(testUsersSaveRequestDto);
+
         //when
         booksService.save(requestDto);
 
         //then
-        Books target = booksRepository.findAll().get(0);
-        assertThat(target.getName()).isEqualTo(testName);
-        assertThat(target.getPrice()).isEqualTo(testPrice);
-        assertThat(target.getStatus()).isEqualTo(testStatus);
-        assertThat(target.getDescription()).isEqualTo(testDescription);
-        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
-        assertThat(target.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(target.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(target.getDescription()).isNull();
+        Books targetBooks = booksRepository.findAll().get(0);
+        Users targetUsers = usersRepository.findAll().get(0);
+
+        assertThat(targetBooks.getName()).isEqualTo(testName);
+        assertThat(targetBooks.getPrice()).isEqualTo(testPrice);
+        assertThat(targetBooks.getStatus()).isEqualTo(testStatus);
+        assertThat(targetBooks.getDescription()).isEqualTo(testDescription);
+        assertThat(targetBooks.getImgUrl()).isEqualTo(testImgUrl);
+        assertThat(targetBooks.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(targetBooks.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(targetBooks.getDescription()).isNull();
+
+        assertThat(targetUsers.getBooksList().size()).isEqualTo(1);
+        assertThat(targetUsers.getBooksList().get(0).getName()).isEqualTo(testName);
     }
 
     static final String testName = "스프링으로 하는 마이크로서비스 구축";
@@ -65,5 +84,18 @@ public class BooksServiceTest {
     static final BooksStatus testStatus = BooksStatus.AVAILABLE;
     static final String testDescription = "완전 새 책";
     static final String testImgUrl = "s3://testImgUrl.com";
+    static final String testUsersId = "testUsersId";
+    static final String testNickname = "testNickname";
+    static final Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+    static final double testX = 1.1;
+    static final double testY = 2.2;
+    static final double testReviewScore = 0.0;
+    static final Long testReviewCount = 0L;
 
+    static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
+            .usersId(testUsersId)
+            .nickname(testNickname)
+            .latitude(testX)
+            .longitude(testY)
+            .build();
 }

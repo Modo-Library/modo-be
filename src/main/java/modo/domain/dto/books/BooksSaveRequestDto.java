@@ -15,6 +15,7 @@ public class BooksSaveRequestDto {
     private String status;
     private String description;
     private String imgUrl;
+    private String usersId;
 
     public Books toEntity() {
         return Books.builder()
