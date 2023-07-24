@@ -2,10 +2,15 @@ package modo.Books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
+import modo.domain.entity.Books;
+import modo.enums.BooksStatus;
 import modo.repository.AccessTokenRepository;
+import modo.repository.BooksRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
+import modo.service.BooksService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +38,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(RestDocumentationExtension.class)
 public class BooksIntegrationTest {
+
+    @Autowired
+    private BooksRepository booksRepository;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -63,6 +71,7 @@ public class BooksIntegrationTest {
 
     @BeforeEach
     void tearDown() {
+        booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
         accessTokenRepository.deleteAll();
@@ -88,6 +97,27 @@ public class BooksIntegrationTest {
                 .andDo(print());
     }
 
+    @Test
+    void Integration_책저장_테스트() throws Exception {
+        saveNewTestUsersAndCreateNewToken();
+        BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                .name(testName)
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId(testUsersId)
+                .build();
+
+        mockMvc.perform(post("/api/v1/books/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+    }
+
 
     private void saveNewTestUsersAndCreateNewToken() throws Exception {
         mockMvc.perform(post("/api/v2/users/save")
@@ -108,7 +138,12 @@ public class BooksIntegrationTest {
     static final double testY = 2.2;
     static final double testReviewScore = 0.0;
     static final Long testReviewCount = 0L;
-    static final String testDescription = "testDescription";
+
+    static final String testName = "스프링으로 하는 마이크로서비스 구축";
+    static final Long testPrice = 40000L;
+    static final BooksStatus testStatus = BooksStatus.AVAILABLE;
+    static final String testDescription = "완전 새 책";
+    static final String testImgUrl = "s3://testImgUrl.com";
 
     static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
             .usersId(testUsersId)
