@@ -2,10 +2,16 @@ package modo.Books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.books.BooksResponseDto;
+import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
+import modo.domain.entity.Books;
+import modo.enums.BooksStatus;
 import modo.repository.AccessTokenRepository;
+import modo.repository.BooksRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
+import modo.service.BooksService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +22,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.restdocs.operation.preprocess.Preprocessors;
+import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -23,6 +30,8 @@ import org.springframework.web.context.WebApplicationContext;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
+import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
@@ -33,6 +42,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ExtendWith(RestDocumentationExtension.class)
 public class BooksIntegrationTest {
+
+    @Autowired
+    private BooksRepository booksRepository;
 
     @Autowired
     private UsersRepository usersRepository;
@@ -63,6 +75,7 @@ public class BooksIntegrationTest {
 
     @BeforeEach
     void tearDown() {
+        booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
         accessTokenRepository.deleteAll();
@@ -74,7 +87,7 @@ public class BooksIntegrationTest {
         saveNewTestUsersAndCreateNewToken();
         final String testKeyName = "testKeyName";
 
-        mockMvc.perform(post("/api/v1/books/{keyName}", testKeyName)
+        mockMvc.perform(post("/api/v1/books/preUrl/{keyName}", testKeyName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("token", accessToken)
                 )
@@ -84,6 +97,49 @@ public class BooksIntegrationTest {
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         pathParameters(
                                 parameterWithName("keyName").description("keyName for PreUrl")
+                        )))
+                .andDo(print());
+    }
+
+    @Test
+    void Integration_책저장_테스트() throws Exception {
+        saveNewTestUsersAndCreateNewToken();
+        BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                .name(testName)
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId(testUsersId)
+                .build();
+
+        mockMvc.perform(post("/api/v1/books/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Books-save",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestFields(
+                                fieldWithPath("name").description("Saving book's name"),
+                                fieldWithPath("price").description("Saving book's price"),
+                                fieldWithPath("status").description("Saving book's status"),
+                                fieldWithPath("description").description(""),
+                                fieldWithPath("imgUrl").description("Saving user's longitude. Type : double"),
+                                fieldWithPath("usersId").description("Saving user's longitude. Type : double")
+                        ),
+                        responseFields(
+                                fieldWithPath("booksId").description("Saving user's usersId"),
+                                fieldWithPath("name").description("Saving user's nickname"),
+                                fieldWithPath("price").description("Saving user's average reviewScore. Type : double. Default :0.0"),
+                                fieldWithPath("status").description("Saving user's total reviewCount. Default : 0L"),
+                                fieldWithPath("deadline").description("Saving user's history : total rentingCount. Default : 0L"),
+                                fieldWithPath("description").description("Saving user's history : total returningCount. Default : 0L"),
+                                fieldWithPath("imgUrl").description("Saving user's history : total buyCount. Default : 0L"),
+                                fieldWithPath("createdAt").description("Saving user's history : total sellCount. Default : 0L"),
+                                fieldWithPath("modifiedAt").description("Saving user's history : total sellCount. Default : 0L")
                         )))
                 .andDo(print());
     }
@@ -108,7 +164,12 @@ public class BooksIntegrationTest {
     static final double testY = 2.2;
     static final double testReviewScore = 0.0;
     static final Long testReviewCount = 0L;
-    static final String testDescription = "testDescription";
+
+    static final String testName = "스프링으로 하는 마이크로서비스 구축";
+    static final Long testPrice = 40000L;
+    static final BooksStatus testStatus = BooksStatus.AVAILABLE;
+    static final String testDescription = "완전 새 책";
+    static final String testImgUrl = "s3://testImgUrl.com";
 
     static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
             .usersId(testUsersId)

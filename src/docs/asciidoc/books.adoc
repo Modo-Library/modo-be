@@ -7,6 +7,11 @@ Powered By Dongwhwan Lee, https://github.com/hwanld
 :toclevels: 1
 :sectlinks:
 
+[[Books-save]]
+== Books-save
+
+operation::Books-save[snippets='http-request,request-body,http-response,response-body']
+
 [[Books-createPreUrl]]
 == Books-createPreUrl
 
