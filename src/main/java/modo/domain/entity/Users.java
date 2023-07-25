@@ -18,7 +18,10 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-@Table(indexes = @Index(name = "idx_nickname", columnList = "nickname"))
+@Table(indexes = {
+        @Index(name = "idx_nickname", columnList = "nickname"),
+        @Index(name = "idx_sub", columnList = "sub")
+})
 public class Users implements UserDetails {
     @Id
     @Column
@@ -26,6 +29,10 @@ public class Users implements UserDetails {
 
     @Column(nullable = false)
     private String nickname;
+
+    // Apple Identifier
+    @Column(nullable = true)
+    private String sub;
 
     @Column
     private Point location;

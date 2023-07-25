@@ -487,8 +487,36 @@ public class UsersServiceTest {
         assertThat(usersRepository.findAll().get(0).getUsersHistory().getReturningCount()).isEqualTo(1L);
     }
 
+    @Test
+    void Service_sub으로usersId찾기_테스트() {
+        // Given
+        // Save testUsers and testUsersHistory through Repository.save
+        Users testUsers = testUsersSaveRequestDto.toEntity();
+        testUsers.setSub(testSub);
+        UsersHistory testUsersHistory = UsersHistory.builder()
+                .users(testUsers)
+                .usersId(testUsersId)
+                .buyCount(0L)
+                .sellCount(0L)
+                .rentingCount(0L)
+                .returningCount(0L)
+                .build();
+        testUsers.setUsersHistory(testUsersHistory);
+        usersRepository.save(testUsers);
+        usersHistoryRepository.save(testUsersHistory);
+
+
+        // When
+        // Test Method : UsersService.findUsersIdBySub
+        String result = usersService.findUsersIdBySub(testSub);
+
+        // Then
+        assertThat(result).isEqualTo(testUsersId);
+    }
+
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";
+    static final String testSub = "testSub";
     static final Point testLocation = GeomUtil.createPoint(1.1, 2.2);
     static final double testX = 1.1;
     static final double testY = 2.2;

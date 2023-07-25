@@ -119,6 +119,14 @@ public class UsersService {
         return findUsers(usersId);
     }
 
+    @Transactional(readOnly = true)
+    public String findUsersIdBySub(String sub) {
+        Users users = usersRepository.findUsersBySub(sub).orElseThrow(
+                () -> new IllegalArgumentException("Users with sub : " + sub + " is not exist!")
+        );
+        return users.getUsersId();
+    }
+
     @Transactional
     public UsersResponseDto changeLocation(String usersId, double latitude, double longitude) {
         Users users = findUsersInRepository(usersId);
