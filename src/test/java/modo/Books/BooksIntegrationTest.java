@@ -32,8 +32,7 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
-import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
+import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -87,7 +86,7 @@ public class BooksIntegrationTest {
         saveNewTestUsersAndCreateNewToken();
         final String testKeyName = "testKeyName";
 
-        mockMvc.perform(post("/api/v1/books/preUrl/{keyName}", testKeyName)
+        mockMvc.perform(post("/api/v1/books/preUrl?keyName=" + testKeyName)
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("token", accessToken)
                 )
@@ -95,7 +94,7 @@ public class BooksIntegrationTest {
                 .andDo(document("Books-createPreUrl",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
-                        pathParameters(
+                        queryParameters(
                                 parameterWithName("keyName").description("keyName for PreUrl")
                         )))
                 .andDo(print());

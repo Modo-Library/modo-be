@@ -6,10 +6,7 @@ import modo.enums.BooksStatus;
 import modo.service.BooksService;
 import modo.service.S3Service;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
@@ -19,8 +16,8 @@ public class BooksController extends BaseController {
     private final S3Service s3Service;
     private final BooksService booksService;
 
-    @PostMapping("/api/v1/books/preUrl/{keyName}")
-    public ResponseEntity<?> createPreUrl(@PathVariable String keyName) throws IOException {
+    @PostMapping("/api/v1/books/preUrl")
+    public ResponseEntity<?> createPreUrl(@RequestParam String keyName) throws IOException {
         return sendResponse(s3Service.createPreUrl(keyName));
     }
 
