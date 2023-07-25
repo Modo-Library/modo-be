@@ -34,8 +34,8 @@ public class JwtTokenProvider {
     private final CustomUserDetailService userDetailService;
     private final RedisTokenService redisTokenService;
 
-    private static long accessTokenValidTime = 60 * 60L;
-    private static long refreshTokenValidTime = 30 * 3600 * 60L;
+    private static long accessTokenValidTime = 30 * 60L;
+    private static long refreshTokenValidTime = 6 * 30 * 60L;
 
     public void setAccessTokenValidTime(Long time) {
         accessTokenValidTime = time;
