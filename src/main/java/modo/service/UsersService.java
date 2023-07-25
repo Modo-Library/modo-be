@@ -46,6 +46,26 @@ public class UsersService {
     }
 
     @Transactional
+    public UsersResponseDto save(UsersSaveRequestDto usersSaveRequestDto, String sub) {
+        // Create users and usersHistory
+        Users users = usersSaveRequestDto.toEntity();
+        UsersHistory usersHistory = new UsersHistory(users);
+
+        // Join users with usersHistory
+        users.setUsersHistory(usersHistory);
+
+        // Add sub value at users
+        users.setSub(sub);
+
+        // Save users and usersHistory
+        usersRepository.save(users);
+        usersHistoryRepository.save(usersHistory);
+
+        // Return usersId
+        return findUsers(users.getUsersId());
+    }
+
+    @Transactional
     public UsersLoginResponseDto login(String usersId) {
         return UsersLoginResponseDto.builder()
                 .accessToken(jwtTokenProvider.createAccessToken(usersId))
@@ -133,6 +153,7 @@ public class UsersService {
         users.updateLocation(latitude, longitude);
         return findUsers(usersId);
     }
+
 
     private Users findUsersInRepository(String usersId) {
         return usersRepository.findById(usersId).orElseThrow(
