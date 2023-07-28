@@ -1,11 +1,14 @@
 package modo.Books;
 
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
+import modo.domain.entity.Pictures;
 import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
+import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
 import modo.service.BooksService;
 import modo.util.GeomUtil;
@@ -17,6 +20,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -30,6 +34,9 @@ public class BooksServiceTest {
     @Autowired
     UsersRepository usersRepository;
 
+    @Autowired
+    PicturesRepository picturesRepository;
+
     BooksService booksService;
 
     @BeforeEach
@@ -39,12 +46,24 @@ public class BooksServiceTest {
 
     @BeforeEach
     void injectRepositoryToUsersService() {
-        booksService = new BooksService(booksRepository, usersRepository);
+        booksService = new BooksService(booksRepository, usersRepository, picturesRepository);
     }
 
     @Test
     void 책저장_테스트() {
         //given
+        PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "1")
+                .filename(testFilename + "1")
+                .build();
+
+        PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "2")
+                .filename(testFilename + "2")
+                .build();
+
+        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
         BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
                 .name(testName)
                 .price(testPrice)
@@ -52,6 +71,7 @@ public class BooksServiceTest {
                 .description(testDescription)
                 .imgUrl(testImgUrl)
                 .usersId(testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
                 .build();
 
         usersRepository.save(testUsersSaveRequestDto.toEntity());
@@ -62,6 +82,7 @@ public class BooksServiceTest {
         //then
         Books targetBooks = booksRepository.findAll().get(0);
         Users targetUsers = usersRepository.findAll().get(0);
+        List<Pictures> targetPicturesList = picturesRepository.findAll();
 
         assertThat(targetBooks.getName()).isEqualTo(testName);
         assertThat(targetBooks.getPrice()).isEqualTo(testPrice);
@@ -74,6 +95,12 @@ public class BooksServiceTest {
 
         assertThat(targetUsers.getBooksList().size()).isEqualTo(1);
         assertThat(targetUsers.getBooksList().get(0).getName()).isEqualTo(testName);
+
+        assertThat(targetPicturesList.size()).isEqualTo(2L);
+        assertThat(targetPicturesList.get(0).getFilename()).isEqualTo(testFilename + "1");
+        assertThat(targetPicturesList.get(0).getImgUrl()).isEqualTo(testImgUrl + "1");
+        assertThat(targetPicturesList.get(1).getFilename()).isEqualTo(testFilename + "2");
+        assertThat(targetPicturesList.get(1).getImgUrl()).isEqualTo(testImgUrl + "2");
     }
 
     static final String testName = "스프링으로 하는 마이크로서비스 구축";
@@ -81,6 +108,7 @@ public class BooksServiceTest {
     static final BooksStatus testStatus = BooksStatus.AVAILABLE;
     static final String testDescription = "완전 새 책";
     static final String testImgUrl = "s3://testImgUrl.com";
+    static final String testFilename = "testFilename.jpg";
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";
     static final Point testLocation = GeomUtil.createPoint(1.1, 2.2);

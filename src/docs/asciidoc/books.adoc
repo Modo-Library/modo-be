@@ -10,7 +10,10 @@ Powered By Dongwhwan Lee, https://github.com/hwanld
 [[Books-save]]
 == Books-save
 
-operation::Books-save[snippets='http-request,request-body,http-response,response-body']
+* Books에 join되어있는 여러 개의 pictures를 한 번에 업로드 하기 위해서, `Books-save` 메소드 하나로 `Pictures 저장` 및 `Books-Pictures 조인` 까지 한 번에 처리합니다.
+* 아래 HTTP Request에 있는 Body는 PicturesSaveRequestDto로, 해당 Dto의 picturesSaveRequestDtoList는 각각의 사진을 DB에 저장하기 위한 picturesSaveRequestDto 의 List 형태로 이루어져 있습니다.
+
+operation::Books-save[snippets='http-request,request-fields,http-response,response-fields']
 
 [[Books-createPreUrl]]
 == Books-createPreUrl
@@ -19,4 +22,4 @@ operation::Books-save[snippets='http-request,request-body,http-response,response
 * keyName으로 URL에 식별자를 주면 해당 식별자를 사용해서 preSignedURL을 발급합니다. keyName은 Upload하는 파일의 이름과는 무관합니다.
 * 생성된 이미지의 URL은 https://modo-deploy.s3.ap-northeast-2.amazonaws.com/{파일명} 을 따릅니다.
 
-operation::Books-createPreUrl[snippets='http-request,path-parameters,http-response']
+operation::Books-createPreUrl[snippets='http-request,query-parameters,http-response']
