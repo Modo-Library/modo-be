@@ -119,6 +119,7 @@ public class JwtTokenProvider {
 
         // Request Reissue before AccessToken Expired
         if (!checkAccessTokenIsExpired(refreshToken)) {
+            expireAllToken(usersId);
             throw new ReIssueBeforeAccessTokenExpiredException("Access Token is still valid! Can't reIssue accessToken!");
         }
 
@@ -134,6 +135,11 @@ public class JwtTokenProvider {
                 .refreshToken(refreshToken)
                 .usersId(usersId)
                 .build();
+    }
+
+    public void expireAllToken(String usersId) {
+        redisTokenService.deleteAccessToken(usersId);
+        redisTokenService.deleteRefreshToken(usersId);
     }
 
 }

@@ -154,6 +154,11 @@ public class UsersService {
         return findUsers(usersId);
     }
 
+    @Transactional
+    public void logout(String accessToken) {
+        String usersId = jwtTokenProvider.getUsersId(accessToken);
+        jwtTokenProvider.expireAllToken(usersId);
+    }
 
     private Users findUsersInRepository(String usersId) {
         return usersRepository.findById(usersId).orElseThrow(
@@ -182,4 +187,5 @@ public class UsersService {
     public boolean isExistsByUsersId(String usersId) {
         return usersRepository.existsByUsersId(usersId);
     }
+
 }

@@ -1,5 +1,6 @@
 package modo.users;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersResponseDto;
@@ -7,10 +8,7 @@ import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.dto.users.UsersReview.EachReviewResponseDto;
 import modo.domain.dto.users.UsersReview.UsersReviewResponseDto;
 import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
-import modo.repository.AccessTokenRepository;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
-import modo.repository.UsersReviewRepository;
+import modo.repository.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,6 +60,9 @@ public class UsersIntegrationTest {
 
     @Autowired
     private AccessTokenRepository accessTokenRepository;
+
+    @Autowired
+    private RefreshTokenRepository refreshTokenRepository;
 
     private MockMvc mockMvc;
 
@@ -389,6 +390,34 @@ public class UsersIntegrationTest {
 
                         )))
                 .andDo(print());
+    }
+
+    @Test
+    void Integration_로그아웃_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
+        mockMvc.perform(delete("/api/v1/users/logout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Users-logout",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        )))
+                .andDo(print());
+
+        assertThat(accessTokenRepository.findById(testUsersId)).isEmpty();
+        assertThat(refreshTokenRepository.findById(testUsersId)).isEmpty();
     }
 
 
