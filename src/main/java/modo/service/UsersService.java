@@ -46,6 +46,26 @@ public class UsersService {
     }
 
     @Transactional
+    public UsersResponseDto save(UsersSaveRequestDto usersSaveRequestDto, String sub) {
+        // Create users and usersHistory
+        Users users = usersSaveRequestDto.toEntity();
+        UsersHistory usersHistory = new UsersHistory(users);
+
+        // Join users with usersHistory
+        users.setUsersHistory(usersHistory);
+
+        // Add sub value at users
+        users.setSub(sub);
+
+        // Save users and usersHistory
+        usersRepository.save(users);
+        usersHistoryRepository.save(usersHistory);
+
+        // Return usersId
+        return findUsers(users.getUsersId());
+    }
+
+    @Transactional
     public UsersLoginResponseDto login(String usersId) {
         return UsersLoginResponseDto.builder()
                 .accessToken(jwtTokenProvider.createAccessToken(usersId))
@@ -119,11 +139,25 @@ public class UsersService {
         return findUsers(usersId);
     }
 
+    @Transactional(readOnly = true)
+    public String findUsersIdBySub(String sub) {
+        Users users = usersRepository.findUsersBySub(sub).orElseThrow(
+                () -> new IllegalArgumentException("Users with sub : " + sub + " is not exist!")
+        );
+        return users.getUsersId();
+    }
+
     @Transactional
     public UsersResponseDto changeLocation(String usersId, double latitude, double longitude) {
         Users users = findUsersInRepository(usersId);
         users.updateLocation(latitude, longitude);
         return findUsers(usersId);
+    }
+
+    @Transactional
+    public void logout(String accessToken) {
+        String usersId = jwtTokenProvider.getUsersId(accessToken);
+        jwtTokenProvider.expireAllToken(usersId);
     }
 
     private Users findUsersInRepository(String usersId) {
@@ -153,4 +187,5 @@ public class UsersService {
     public boolean isExistsByUsersId(String usersId) {
         return usersRepository.existsByUsersId(usersId);
     }
+
 }

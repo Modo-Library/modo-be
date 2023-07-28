@@ -22,4 +22,10 @@ public class BaseController {
         return new ResponseEntity<Object>(data, headers, httpStatus);
     }
 
+    public ResponseEntity<?> sendResponse() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(new MediaType("application", "json", StandardCharsets.UTF_8));
+        return new ResponseEntity(headers, HttpStatus.OK);
+    }
+
 }

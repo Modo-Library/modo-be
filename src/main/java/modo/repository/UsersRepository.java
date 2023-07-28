@@ -13,6 +13,8 @@ public interface UsersRepository extends JpaRepository<Users, String> {
 
     public boolean existsByUsersId(String usersId);
 
+    public Optional<Users> findUsersBySub(String sub);
+
     @Override
     @Query("select u from Users u left join fetch u.usersHistory uh where u.usersId = :usersId")
     public Optional<Users> findById(@Param("usersId") String usersId);

@@ -34,8 +34,8 @@ public class JwtTokenProvider {
     private final CustomUserDetailService userDetailService;
     private final RedisTokenService redisTokenService;
 
-    private static long accessTokenValidTime = 60 * 60L;
-    private static long refreshTokenValidTime = 30 * 3600 * 60L;
+    private static long accessTokenValidTime = 30 * 60L;
+    private static long refreshTokenValidTime = 6 * 30 * 60L;
 
     public void setAccessTokenValidTime(Long time) {
         accessTokenValidTime = time;
@@ -119,6 +119,7 @@ public class JwtTokenProvider {
 
         // Request Reissue before AccessToken Expired
         if (!checkAccessTokenIsExpired(refreshToken)) {
+            expireAllToken(usersId);
             throw new ReIssueBeforeAccessTokenExpiredException("Access Token is still valid! Can't reIssue accessToken!");
         }
 
@@ -134,6 +135,11 @@ public class JwtTokenProvider {
                 .refreshToken(refreshToken)
                 .usersId(usersId)
                 .build();
+    }
+
+    public void expireAllToken(String usersId) {
+        redisTokenService.deleteAccessToken(usersId);
+        redisTokenService.deleteRefreshToken(usersId);
     }
 
 }

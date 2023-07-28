@@ -53,4 +53,10 @@ public class UsersController extends BaseController {
         return sendResponse(usersService.changeLocation(usersId, latitude, longitude));
     }
 
+    @DeleteMapping("api/v1/users/logout")
+    public ResponseEntity<?> logout(@RequestHeader(value = "token") String token) {
+        usersService.logout(token);
+        return sendResponse();
+    }
+
 }

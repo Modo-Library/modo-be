@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
+import modo.domain.entity.Users;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -21,6 +22,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -142,21 +144,26 @@ public class AppleLoginService {
                 String payload = idToken.split("[.]")[1];
                 // public key로 idToken 복호화
                 Map<String, Object> payloadMap = new ObjectMapper().readValue(new String(Base64.getDecoder().decode(payload)), Map.class);
+
                 // 사용자 이메일 정보 추출
-                String email = payloadMap.get("email").toString();
-//                String nickname = payloadMap.get("fullname").toString();
-                log.info("payloadMap is : {}", payloadMap);
+                String sub = payloadMap.get("sub").toString();
+                String usersId;
+                try {
+                    usersId = usersService.findUsersIdBySub(sub);
+                } catch (IllegalArgumentException e) {
+                    usersId = payloadMap.get("email").toString();
+                }
 
                 // 결과 반환
-                return registerAndLogin("nickname", email);
-//                return registerAndLogin(nickname, email);
+                return registerAndLogin("nickname", usersId, sub);
             }
         }
         // 결과 반환
         return null;
     }
 
-    public UsersLoginResponseDto registerAndLogin(String nickname, String email) throws Exception {
+    @Transactional
+    public UsersLoginResponseDto registerAndLogin(String nickname, String email, String sub) throws Exception {
         if (!usersService.isExistsByUsersId(email)) {
             UsersSaveRequestDto requestDto = UsersSaveRequestDto.builder()
                     .usersId(email)
@@ -165,7 +172,7 @@ public class AppleLoginService {
                     .longitude(longitude_ajou)
                     .build();
 
-            usersService.save(requestDto);
+            usersService.save(requestDto, sub);
         }
         return usersService.login(email);
     }
