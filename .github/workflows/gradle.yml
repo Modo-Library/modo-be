@@ -97,24 +97,24 @@ jobs:
                env:
                  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
                  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                   run: |
-                     aws s3 cp \
-                     --region ap-northeast-2 \
-                     --acl private \
-                     ./modo-deploy.zip s3://modo-deploy/
-                     
-                     
-                     - name: Deploy with AWS CodeDeploy
-                       env:
-                         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-                         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                       run: |
-                         aws deploy create-deployment \
-                         --application-name $CODEDEPLOY_APPLICATION_NAME \
-                         --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-                         --file-exists-behavior OVERWRITE \
-                         --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=modo-deploy.zip \
-                         --region ap-northeast-2
+               run: |
+                 aws s3 cp \
+                 --region ap-northeast-2 \
+                 --acl private \
+                 ./modo-deploy.zip s3://modo-deploy/
+
+
+               - name: Deploy with AWS CodeDeploy
+                 env:
+                   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                   AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                 run: |
+                   aws deploy create-deployment \
+                   --application-name $CODEDEPLOY_APPLICATION_NAME \
+                   --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+                   --file-exists-behavior OVERWRITE \
+                   --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=modo-deploy.zip \
+                   --region ap-northeast-2
 
 
 
