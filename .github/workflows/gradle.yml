@@ -51,8 +51,8 @@ jobs:
       - name: Load AWS SDK Key file
         run: echo "${{ secrets.AWS_SDK_KEY }}" > ~/.aws/config
 
-      - name: Test with gradle
-        run: ./gradlew clean test
+      - name: Build with gradle
+        run: ./gradlew clean build
 
       - name: Build with gradle
         run: ./gradlew clean build
