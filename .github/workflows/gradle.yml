@@ -7,12 +7,6 @@
 
 name: Java CI with Gradle
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
 permissions: write-all
 
 env:
@@ -21,9 +15,13 @@ env:
   DEPLOYMENT_GROUP_NAME: modo-deploy
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
+    on:
+      push:
+        branches: [ "main" ]
+      pull_request:
+        branches: [ "main" ]
 
     steps:
       - uses: actions/checkout@v3
@@ -54,9 +52,19 @@ jobs:
       - name: Load AWS SDK Key file
         run: echo "${{ secrets.AWS_SDK_KEY }}" > ~/.aws/config
 
-      - name: Build with gradle
-        run: ./gradlew clean build
+      - name: Test with gradle
+        run: ./gradlew clean test
 
+
+  build:
+    needs: test
+    runs-on: ubuntu-latest
+
+    on:
+      push:
+        branches: [ "main" ]
+
+    steps:
       - name: Build with gradle
         run: ./gradlew clean build
 
@@ -81,28 +89,36 @@ jobs:
         run: zip -r -qq -j ./modo-deploy.zip ./deploy/
 
 
-      - name: Deliver to AWS S3
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          aws s3 cp \
-          --region ap-northeast-2 \
-          --acl private \
-          ./modo-deploy.zip s3://modo-deploy/
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    on:
+      push:
+        branches: [ "main" ]
+
+        - name: Deliver to AWS S3
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: |
+            aws s3 cp \
+            --region ap-northeast-2 \
+            --acl private \
+            ./modo-deploy.zip s3://modo-deploy/
 
 
-      - name: Deploy
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        run: |
-          aws deploy create-deployment \
-          --application-name $CODEDEPLOY_APPLICATION_NAME \
-          --deployment-group-name $DEPLOYMENT_GROUP_NAME \
-          --file-exists-behavior OVERWRITE \
-          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=modo-deploy.zip \
-          --region ap-northeast-2
+        - name: Deploy with AWS CodeDeploy
+          env:
+            AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          run: |
+            aws deploy create-deployment \
+            --application-name $CODEDEPLOY_APPLICATION_NAME \
+            --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+            --file-exists-behavior OVERWRITE \
+            --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=modo-deploy.zip \
+            --region ap-northeast-2
 
 
 
