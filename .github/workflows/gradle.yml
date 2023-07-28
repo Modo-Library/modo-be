@@ -54,11 +54,6 @@ jobs:
       - name: Test with gradle
         run: ./gradlew clean test
 
-
-  build:
-    needs: test
-
-    steps:
       - name: Build with gradle
         run: ./gradlew clean build
 
@@ -71,7 +66,6 @@ jobs:
       - name: Copy appspec
         run: cp ./appspec.yml ./deploy/
 
-
       - name: Copy shell
         run: cp ./scripts/* ./deploy/
 
@@ -82,11 +76,6 @@ jobs:
       - name: Make zip file
         run: zip -r -qq -j ./modo-deploy.zip ./deploy/
 
-
-  deploy:
-    needs: build
-
-    steps:
       - name: Deliver to AWS S3
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
@@ -96,7 +85,6 @@ jobs:
           --region ap-northeast-2 \
           --acl private \
           ./modo-deploy.zip s3://modo-deploy/
-
 
       - name: Deploy with AWS CodeDeploy
         env:
