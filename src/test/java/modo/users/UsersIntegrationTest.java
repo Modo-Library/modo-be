@@ -1,6 +1,5 @@
 package modo.users;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.users.Users.UsersResponseDto;
