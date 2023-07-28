@@ -4,13 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.books.BooksResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
 import modo.enums.BooksStatus;
-import modo.repository.AccessTokenRepository;
-import modo.repository.BooksRepository;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
+import modo.repository.*;
 import modo.service.BooksService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +24,8 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import java.util.List;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
@@ -55,6 +55,9 @@ public class BooksIntegrationTest {
     private AccessTokenRepository accessTokenRepository;
 
     @Autowired
+    private PicturesRepository picturesRepository;
+
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     private MockMvc mockMvc;
@@ -74,6 +77,7 @@ public class BooksIntegrationTest {
 
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
@@ -103,13 +107,26 @@ public class BooksIntegrationTest {
     @Test
     void Integration_책저장_테스트() throws Exception {
         saveNewTestUsersAndCreateNewToken();
+        PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "1")
+                .filename(testFilename + "1")
+                .build();
+
+        PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "2")
+                .filename(testFilename + "2")
+                .build();
+
+        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
         BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
                 .name(testName)
                 .price(testPrice)
                 .status(testStatus.toString())
                 .description(testDescription)
-                .imgUrl(testImgUrl)
+                .imgUrl(testImgUrl + "1")
                 .usersId(testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
                 .build();
 
         mockMvc.perform(post("/api/v1/books/save")
@@ -122,12 +139,15 @@ public class BooksIntegrationTest {
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         requestFields(
-                                fieldWithPath("name").description("Saving book's name"),
-                                fieldWithPath("price").description("Saving book's price"),
-                                fieldWithPath("status").description("Saving book's status"),
-                                fieldWithPath("description").description(""),
-                                fieldWithPath("imgUrl").description("Saving user's longitude. Type : double"),
-                                fieldWithPath("usersId").description("Saving user's longitude. Type : double")
+                                fieldWithPath("name").description("Saving book's name").type(JsonFieldType.STRING),
+                                fieldWithPath("price").description("Saving book's price").type(JsonFieldType.NUMBER),
+                                fieldWithPath("status").description("Saving book's status").type(JsonFieldType.STRING),
+                                fieldWithPath("description").description("Saving book's description").type(JsonFieldType.STRING),
+                                fieldWithPath("imgUrl").description("Saving book's thumbnail image's URL").type(JsonFieldType.STRING),
+                                fieldWithPath("usersId").description("Saving book's owner Id").type(JsonFieldType.STRING),
+                                fieldWithPath("picturesSaveRequestDtoList").description("Saving Book's pictures list").type(JsonFieldType.ARRAY),
+                                fieldWithPath("picturesSaveRequestDtoList.[].imgUrl").description("Each picture's imgUrl").type(JsonFieldType.STRING),
+                                fieldWithPath("picturesSaveRequestDtoList.[].filename").description("Each picture's filename").type(JsonFieldType.STRING)
                         ),
                         responseFields(
                                 fieldWithPath("booksId").description("Saving user's usersId"),
@@ -169,6 +189,8 @@ public class BooksIntegrationTest {
     static final BooksStatus testStatus = BooksStatus.AVAILABLE;
     static final String testDescription = "완전 새 책";
     static final String testImgUrl = "s3://testImgUrl.com";
+
+    static final String testFilename = "testFilename.jpg";
 
     static final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
             .usersId(testUsersId)

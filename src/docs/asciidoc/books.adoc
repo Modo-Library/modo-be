@@ -10,6 +10,9 @@ Powered By Dongwhwan Lee, https://github.com/hwanld
 [[Books-save]]
 == Books-save
 
+* Books에 join되어있는 여러 개의 pictures를 한 번에 업로드 하기 위해서, `Books-save` 메소드 하나로 `Pictures 저장` 및 `Books-Pictures 조인` 까지 한 번에 처리합니다.
+* 아래 HTTP Request에 있는 Body는 PicturesSaveRequestDto로, 해당 Dto의 picturesSaveRequestDtoList는 각각의 사진을 DB에 저장하기 위한 picturesSaveRequestDto 의 List 형태로 이루어져 있습니다.
+
 operation::Books-save[snippets='http-request,request-fields,http-response,response-fields']
 
 [[Books-createPreUrl]]
