@@ -2,6 +2,7 @@ package modo.domain.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.enums.BooksStatus;
 
 import java.time.LocalDateTime;
@@ -64,5 +65,14 @@ public class Books {
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Pictures> picturesList = new ArrayList<>();
+
+    public void update(BooksUpdateRequestDto requestDto) {
+        setName(requestDto.getName());
+        setPrice(requestDto.getPrice());
+        setStatus(BooksStatus.valueOf(requestDto.getStatus()));
+        setDescription(requestDto.getDescription());
+        setImgUrl(requestDto.getImgUrl());
+        setModifiedAt(LocalDateTime.now());
+    }
 
 }

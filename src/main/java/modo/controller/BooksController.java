@@ -2,6 +2,7 @@ package modo.controller;
 
 import lombok.RequiredArgsConstructor;
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.enums.BooksStatus;
 import modo.service.BooksService;
 import modo.service.S3Service;
@@ -24,6 +25,11 @@ public class BooksController extends BaseController {
     @PostMapping("/api/v1/books/save")
     public ResponseEntity<?> save(@RequestBody BooksSaveRequestDto requestDto) {
         return sendResponse(booksService.save(requestDto));
+    }
+
+    @PutMapping("/api/v1/books/update")
+    public ResponseEntity<?> update(@RequestBody BooksUpdateRequestDto requestDto) {
+        return sendResponse(booksService.update(requestDto));
     }
 
 }

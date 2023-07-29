@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.books.BooksResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.entity.Books;
 import modo.domain.entity.Pictures;
@@ -49,5 +50,18 @@ public class BooksService {
         // Save books
         booksRepository.save(books);
         return new BooksResponseDto(books);
+    }
+
+    @Transactional
+    public BooksResponseDto update(BooksUpdateRequestDto requestDto) {
+        Books target = findBooksInRepository(requestDto.getBooksId());
+        target.update(requestDto);
+        return new BooksResponseDto(target);
+    }
+
+    private Books findBooksInRepository(Long booksId) {
+        return booksRepository.findById(booksId).orElseThrow(
+                () -> new IllegalArgumentException("Books with id : " + booksId + "is not exist!")
+        );
     }
 }

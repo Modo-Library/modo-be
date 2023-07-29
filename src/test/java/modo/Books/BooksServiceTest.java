@@ -1,6 +1,7 @@
 package modo.Books;
 
 import modo.domain.dto.books.BooksSaveRequestDto;
+import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
@@ -101,6 +102,66 @@ public class BooksServiceTest {
         assertThat(targetPicturesList.get(0).getImgUrl()).isEqualTo(testImgUrl + "1");
         assertThat(targetPicturesList.get(1).getFilename()).isEqualTo(testFilename + "2");
         assertThat(targetPicturesList.get(1).getImgUrl()).isEqualTo(testImgUrl + "2");
+    }
+
+    @Test
+    void 책업데이트_테스트() {
+        saveTestBooksAndPicturesList();
+
+        Long testBooksId = booksRepository.findAll().get(0).getBooksId();
+        String testUpdateName = "update" + testName;
+        Long testUpdatePrice = testPrice + 10000L;
+        BooksStatus testUpdateStatus = BooksStatus.RENTING;
+        String testUpdateDescription = "update" + testDescription;
+        String testUpdateImgUrl = testImgUrl + "2";
+
+        BooksUpdateRequestDto requestDto = BooksUpdateRequestDto.builder()
+                .booksId(testBooksId)
+                .name(testUpdateName)
+                .price(testUpdatePrice)
+                .status(testUpdateStatus.toString())
+                .description(testUpdateDescription)
+                .imgUrl(testUpdateImgUrl)
+                .build();
+
+        booksService.update(requestDto);
+
+        Books target = booksRepository.findAll().get(0);
+
+        assertThat(target.getName()).isEqualTo(testUpdateName);
+        assertThat(target.getPrice()).isEqualTo(testUpdatePrice);
+        assertThat(target.getStatus()).isEqualTo(testUpdateStatus);
+        assertThat(target.getDescription()).isEqualTo(testUpdateDescription);
+        assertThat(target.getImgUrl()).isEqualTo(testUpdateImgUrl);
+        assertThat(target.getModifiedAt()).isNotEqualTo(target.getCreatedAt());
+
+    }
+
+    private void saveTestBooksAndPicturesList() {
+        PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "1")
+                .filename(testFilename + "1")
+                .build();
+
+        PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "2")
+                .filename(testFilename + "2")
+                .build();
+
+        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
+        BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                .name(testName)
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId(testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .build();
+
+        usersRepository.save(testUsersSaveRequestDto.toEntity());
+        booksService.save(requestDto);
     }
 
     static final String testName = "스프링으로 하는 마이크로서비스 구축";
