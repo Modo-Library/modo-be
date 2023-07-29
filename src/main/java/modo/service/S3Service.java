@@ -40,7 +40,7 @@ public class S3Service {
         PutObjectRequest objectRequest = PutObjectRequest.builder()
                 .bucket(S3_BUCKET_NAME)
                 .key(keyName)
-                .contentType("image/png")
+                .contentType("image/webp")
                 .build();
 
         PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
