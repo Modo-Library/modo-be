@@ -91,6 +91,10 @@ public class Users implements UserDetails {
         this.booksList.add(books);
     }
 
+    public void removeBooks(Books books) {
+        this.booksList.remove(books);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();

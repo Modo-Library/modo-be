@@ -1,5 +1,6 @@
 package modo.Books;
 
+import modo.auth.JwtTokenProvider;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
@@ -8,6 +9,7 @@ import modo.domain.entity.Books;
 import modo.domain.entity.Pictures;
 import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
+import modo.exception.booksException.UsersMismatchException;
 import modo.repository.BooksRepository;
 import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
@@ -16,6 +18,7 @@ import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -24,6 +27,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @AutoConfigureTestDatabase
@@ -38,6 +44,9 @@ public class BooksServiceTest {
     @Autowired
     PicturesRepository picturesRepository;
 
+    @Mock
+    JwtTokenProvider jwtTokenProvider;
+
     BooksService booksService;
 
     @BeforeEach
@@ -47,11 +56,11 @@ public class BooksServiceTest {
 
     @BeforeEach
     void injectRepositoryToUsersService() {
-        booksService = new BooksService(booksRepository, usersRepository, picturesRepository);
+        booksService = new BooksService(booksRepository, usersRepository, picturesRepository, jwtTokenProvider);
     }
 
     @Test
-    void 책저장_테스트() {
+    void Service_책저장_테스트() {
         //given
         PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
                 .imgUrl(testImgUrl + "1")
@@ -105,7 +114,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void 책업데이트_테스트() {
+    void Service_책업데이트_테스트() {
         saveTestBooksAndPicturesList();
 
         Long testBooksId = booksRepository.findAll().get(0).getBooksId();
@@ -135,6 +144,33 @@ public class BooksServiceTest {
         assertThat(target.getImgUrl()).isEqualTo(testUpdateImgUrl);
         assertThat(target.getModifiedAt()).isNotEqualTo(target.getCreatedAt());
 
+    }
+
+    @Test
+    void Service_책삭제_테스트() {
+        // given
+        saveTestBooksAndPicturesList();
+        when(jwtTokenProvider.getUsersId(any())).thenReturn(testUsersId);
+        Long testBooksId = booksRepository.findAll().get(0).getBooksId();
+        String testAccessToken = "testAccessToken";
+
+        // when
+        booksService.delete(testBooksId, testAccessToken);
+
+        // then
+        assertThat(booksRepository.findAll().size()).isZero();
+    }
+
+    @Test
+    void Service_책삭제_잘못된토큰으로_테스트() {
+        // given
+        saveTestBooksAndPicturesList();
+        when(jwtTokenProvider.getUsersId(any())).thenReturn("wrong" + testUsersId);
+        Long testBooksId = booksRepository.findAll().get(0).getBooksId();
+        String testAccessToken = "testAccessToken";
+
+        // when + then : assertThrows
+        assertThrows(UsersMismatchException.class, () -> booksService.delete(testBooksId, testAccessToken));
     }
 
     private void saveTestBooksAndPicturesList() {

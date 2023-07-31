@@ -8,6 +8,7 @@ import modo.enums.BooksStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @NoArgsConstructor
@@ -73,6 +74,10 @@ public class Books {
         setDescription(requestDto.getDescription());
         setImgUrl(requestDto.getImgUrl());
         setModifiedAt(LocalDateTime.now());
+    }
+
+    public boolean isNotOwnerId(String usersId) {
+        return !owner.getUsersId().equals(usersId);
     }
 
 }

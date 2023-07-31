@@ -29,6 +29,9 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
@@ -36,6 +39,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.request.RequestDocumentation.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -102,6 +106,9 @@ public class BooksIntegrationTest {
                 .andDo(document("Books-createPreUrl",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access -token value")
+                        ),
                         queryParameters(
                                 parameterWithName("keyName").description("keyName for PreUrl")
                         )))
@@ -131,6 +138,9 @@ public class BooksIntegrationTest {
                                 fieldWithPath("picturesSaveRequestDtoList").description("Saving Book's pictures list").type(JsonFieldType.ARRAY),
                                 fieldWithPath("picturesSaveRequestDtoList.[].imgUrl").description("Each picture's imgUrl").type(JsonFieldType.STRING),
                                 fieldWithPath("picturesSaveRequestDtoList.[].filename").description("Each picture's filename").type(JsonFieldType.STRING)
+                        ),
+                        requestHeaders(
+                                headerWithName("token").description("Access token value")
                         ),
                         responseFields(
                                 fieldWithPath("booksId").description("Saving book's booksId").type(JsonFieldType.NUMBER),
@@ -184,6 +194,9 @@ public class BooksIntegrationTest {
                                 fieldWithPath("description").description("Update target description").type(JsonFieldType.STRING),
                                 fieldWithPath("imgUrl").description("Update target imgUrl").type(JsonFieldType.STRING)
                         ),
+                        requestHeaders(
+                                headerWithName("token").description("Access token value")
+                        ),
                         responseFields(
                                 fieldWithPath("booksId").description("Saving book's booksId").type(JsonFieldType.NUMBER),
                                 fieldWithPath("name").description("Saving book's name").type(JsonFieldType.STRING),
@@ -196,6 +209,34 @@ public class BooksIntegrationTest {
                                 fieldWithPath("modifiedAt").description("Saving user's modified LocalDateTime").type(JsonFieldType.STRING)
                         )))
                 .andDo(print());
+    }
+
+    @Test
+    void Integration_책삭제_테스트() throws Exception {
+        saveNewTestUsersAndCreateNewToken();
+        saveNewBooksAndPictures();
+
+        Long testBooksId = books.getBooksId();
+
+        mockMvc.perform(delete("/api/v1/books/delete?booksId=" + testBooksId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Books-delete",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        queryParameters(
+                                parameterWithName("booksId").description("Target book's id for delete")
+                        ),
+                        requestHeaders(
+                                headerWithName("token").description("Access token value")
+                        )
+                ))
+                .andDo(print());
+
+        assertThat(booksRepository.findAll().size()).isZero();
+        assertThat(picturesRepository.findAll().size()).isZero();
     }
 
 

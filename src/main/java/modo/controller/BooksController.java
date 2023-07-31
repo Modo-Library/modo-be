@@ -32,4 +32,10 @@ public class BooksController extends BaseController {
         return sendResponse(booksService.update(requestDto));
     }
 
+    @DeleteMapping("/api/v1/books/delete")
+    public ResponseEntity<?> delete(@RequestParam(value = "booksId") Long booksId, @RequestHeader(value = "token") String token) {
+        booksService.delete(booksId, token);
+        return sendResponse();
+    }
+
 }
