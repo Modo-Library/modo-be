@@ -47,7 +47,7 @@ jobs:
           container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
-          mysql root password: '1234'
+          mysql root password: ${{ secrets.MYSQL_ROOT_PASSWORD }} # Required if "mysql user" exists. The password for the "mysql user"
 
       - name: Create Properties files
         run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config ; mkdir ./src/test/resources; touch ./src/test/resources/application-test.properties
