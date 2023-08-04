@@ -43,9 +43,7 @@ jobs:
           container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
-          mysql root password: 1234
-          mysql user: 'root'
-          mysql password: 1234
+          mysql root password: '1234'
 
       - name: MySql Server in GitHub Actions
         uses: mirromutth/mysql-action@v1.1
@@ -54,9 +52,7 @@ jobs:
           container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
-          mysql root password: 1234
-          mysql user: 'root'
-          mysql password: 1234
+          mysql root password: '1234'
 
       - name: Create Properties files
         run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config
