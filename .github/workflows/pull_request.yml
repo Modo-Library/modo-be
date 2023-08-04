@@ -42,7 +42,7 @@ jobs:
           mysql password: 1234
 
       - name: Create Properties files
-        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config ; touch ./src/test/resources/application-test.properties
+        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config ; mkdir ./src/test/resources; touch ./src/test/resources/application-test.properties
 
       - name: Load Application Properties
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
