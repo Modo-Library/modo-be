@@ -10,7 +10,7 @@ name: Java CI with Gradle
 permissions: write-all
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
 
 env:
