@@ -42,7 +42,7 @@ jobs:
           mysql password: 1234
 
       - name: Create Properties files
-        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config
+        run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config ; touch ./src/test/resources/application-test.properties
 
       - name: Load Application Properties
         run: echo "${{ secrets.APPLICATION_PROPERTIES }}" > ./src/main/resources/application.properties
@@ -52,6 +52,9 @@ jobs:
 
       - name: Load Application Real2 Properties
         run: echo "${{ secrets.APPLICATION_REAL2_PROPERTIES }}" > ./src/main/resources/application-real2.properties
+
+      - name: Load Application Test Properties
+        run: echo "${{ secrets.APPLICATION_TEST_PROPERTIES }}" > ./src/test/resources/application-test.properties
 
       - name: Load AWS SDK Key file
         run: echo "${{ secrets.AWS_SDK_KEY }}" > ~/.aws/config
