@@ -31,10 +31,22 @@ jobs:
       - name: Redis Server in GitHub Actions
         uses: supercharge/redis-github-action@1.5.0
 
-      - name: MySql Server in GitHyub Actions
+      - name: MySql Test Server in GitHub Actions
         uses: mirromutth/mysql-action@v1.1
         with:
-          container port: 3305 # Optional, default value is 3306. The port of container
+          host port: 3305 # Optional, default value is 3306. The port of host
+          container port: 3306 # Optional, default value is 3306. The port of container
+          mysql version: '8.0'
+          mysql database: 'modo'
+          mysql root password: $1234
+          mysql user: 'root'
+          mysql password: 1234
+
+      - name: MySql Server in GitHub Actions
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306 # Optional, default value is 3306. The port of host
+          container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
           mysql root password: $1234
