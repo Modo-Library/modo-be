@@ -43,7 +43,7 @@ jobs:
           container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
-          mysql root password: $1234
+          mysql root password: 1234
           mysql user: 'root'
           mysql password: 1234
 
@@ -54,7 +54,7 @@ jobs:
           container port: 3306 # Optional, default value is 3306. The port of container
           mysql version: '8.0'
           mysql database: 'modo'
-          mysql root password: $1234
+          mysql root password: 1234
           mysql user: 'root'
           mysql password: 1234
 
