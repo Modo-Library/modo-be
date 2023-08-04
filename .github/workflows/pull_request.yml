@@ -10,8 +10,13 @@ name: Java CI with Gradle
 permissions: write-all
 
 on:
-  pull_request:
+  push:
     branches: [ "main" ]
+
+env:
+  S3_BUCKET_NAME: modo-deploy
+  CODEDEPLOY_APPLICATION_NAME: modo-deploy
+  DEPLOYMENT_GROUP_NAME: modo-deploy
 
 jobs:
   test:
@@ -31,6 +36,16 @@ jobs:
       - name: Redis Server in GitHub Actions
         uses: supercharge/redis-github-action@1.5.0
 
+      - name: MySql Server in GitHyub Actions
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          container port: 3305 # Optional, default value is 3306. The port of container
+          mysql version: '8.0'
+          mysql database: 'modo'
+          mysql root password: $1234
+          mysql user: 'root'
+          mysql password: 1234
+
       - name: Create Properties files
         run: touch ./src/main/resources/application.properties ; touch ./src/main/resources/application-real1.properties ; touch ./src/main/resources/application-real2.properties ; mkdir ~/.aws ; touch ~/.aws/config
 
@@ -46,5 +61,49 @@ jobs:
       - name: Load AWS SDK Key file
         run: echo "${{ secrets.AWS_SDK_KEY }}" > ~/.aws/config
 
-      - name: Test with gradle
-        run: ./gradlew clean test
+      - name: Build with gradle
+        run: ./gradlew clean build
+
+      - name: Build with gradle
+        run: ./gradlew clean build
+
+      - name: Make Directory for deliver
+        run: mkdir deploy
+
+      - name: Copy Jar
+        run: cp ./build/libs/*.jar ./deploy/
+
+      - name: Copy appspec
+        run: cp ./appspec.yml ./deploy/
+
+      - name: Copy shell
+        run: cp ./scripts/* ./deploy/
+
+      - name: Grant execute permission for scripts
+        run: chmod +x ./scripts/*
+
+
+      - name: Make zip file
+        run: zip -r -qq -j ./modo-deploy.zip ./deploy/
+
+      - name: Deliver to AWS S3
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws s3 cp \
+          --region ap-northeast-2 \
+          --acl private \
+          ./modo-deploy.zip s3://modo-deploy/
+
+      - name: Deploy with AWS CodeDeploy
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        run: |
+          aws deploy create-deployment \
+          --application-name $CODEDEPLOY_APPLICATION_NAME \
+          --deployment-group-name $DEPLOYMENT_GROUP_NAME \
+          --file-exists-behavior OVERWRITE \
+          --s3-location bucket=$S3_BUCKET_NAME,bundleType=zip,key=modo-deploy.zip \
+          --region ap-northeast-2
