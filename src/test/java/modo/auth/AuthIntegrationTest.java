@@ -6,7 +6,6 @@ import modo.enums.ErrorCode;
 import modo.repository.AccessTokenRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
-import modo.repository.UsersReviewRepository;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,9 +54,6 @@ public class AuthIntegrationTest {
 
     @Autowired
     private AccessTokenRepository accessTokenRepository;
-
-    @Autowired
-    private UsersReviewRepository usersReviewRepository;
 
     private MockMvc mockMvc;
 

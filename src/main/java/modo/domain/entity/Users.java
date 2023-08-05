@@ -46,7 +46,6 @@ public class Users implements UserDetails {
     @OneToOne(fetch = FetchType.EAGER, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private UsersHistory usersHistory;
 
-    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersReview> usersReviewList = new ArrayList<>();
 
@@ -54,12 +53,10 @@ public class Users implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "owner", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Books> booksList = new ArrayList<>();
 
-    @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersBooksHistory> usersBooksHistoryList = new ArrayList<>();
 
-    @Builder.Default
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Likes> likesList = new ArrayList<>();
 
     public void setUsersHistory(UsersHistory usersHistory) {

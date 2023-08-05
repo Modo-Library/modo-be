@@ -14,7 +14,6 @@ import modo.exception.booksException.UsersMismatchException;
 import modo.repository.BooksRepository;
 import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
-import modo.util.GeomUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,9 +40,6 @@ public class BooksService {
         // Join books and users
         books.setOwner(users);
         users.addBooks(books);
-
-        // Set Book's Location : Same as owner's location
-        books.setLocation(users.getLocation());
 
         booksSaveRequestDto.getPicturesSaveRequestDtoList().stream()
                 // Convert eachDto to Pictures entity

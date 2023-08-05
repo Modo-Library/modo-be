@@ -14,15 +14,13 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
+@AutoConfigureTestDatabase
 public class LikesRepositoryTest {
     @Autowired
     LikesRepository likesRepository;
@@ -46,16 +44,13 @@ public class LikesRepositoryTest {
                 .users(testUsers)
                 .books(testBooks)
                 .build();
-
-        testUsers.getLikesList().add(likes);
-        testBooks.getLikesList().add(likes);
-
         likesRepository.save(likes);
 
         Likes target = likesRepository.findAll().get(0);
 
-        assertThat(target.getBooks()).isEqualTo(testBooks);
-        assertThat(target.getUsers()).isEqualTo(testUsers);
+        assertThat(target.getBooks().getName()).isEqualTo(testName);
+        assertThat(target.getUsers().getUsersId()).isEqualTo(testUsersId);
+
     }
 
     // Test Users Information : static final variable

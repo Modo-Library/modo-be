@@ -1,7 +1,6 @@
 package modo.users;
 
 import modo.domain.entity.Users;
-import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,25 +9,19 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
+@AutoConfigureTestDatabase
 public class UsersRepositoryTest {
     @Autowired
     UsersRepository usersRepository;
 
-    @Autowired
-    UsersHistoryRepository usersHistoryRepository;
-
 
     @BeforeEach
     void tearDown() {
-        usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
     }
 

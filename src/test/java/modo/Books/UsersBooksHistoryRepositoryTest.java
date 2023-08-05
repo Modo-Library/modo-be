@@ -4,7 +4,9 @@ import modo.domain.entity.Books;
 import modo.domain.entity.Users;
 import modo.domain.entity.UsersBooksHistory;
 import modo.enums.BooksStatus;
-import modo.repository.*;
+import modo.repository.BooksRepository;
+import modo.repository.UsersBooksHistoryRepository;
+import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,15 +14,13 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@ActiveProfiles("test")
+@AutoConfigureTestDatabase
 public class UsersBooksHistoryRepositoryTest {
 
     @Autowired
@@ -32,16 +32,8 @@ public class UsersBooksHistoryRepositoryTest {
     @Autowired
     BooksRepository booksRepository;
 
-    @Autowired
-    UsersReviewRepository usersReviewRepository;
-
-    @Autowired
-    UsersHistoryRepository usersHistoryRepository;
-
     @BeforeEach
     void tearDown() {
-        usersReviewRepository.deleteAllInBatch();
-        usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersBooksHistoryRepository.deleteAllInBatch();
