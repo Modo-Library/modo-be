@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.enums.BooksStatus;
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -43,6 +44,9 @@ public class Books {
     @Column(nullable = false)
     private LocalDateTime modifiedAt;
 
+    @Column
+    private Point location;
+
     @Builder
     public Books(String name, Long price, BooksStatus status, String description, String imgUrl) {
         this.name = name;
@@ -52,6 +56,7 @@ public class Books {
         this.imgUrl = imgUrl;
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();
+
     }
 
     @ManyToOne
@@ -61,7 +66,7 @@ public class Books {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<UsersBooksHistory> usersBooksHistoryList = new ArrayList<>();
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Likes> likesList = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "books", cascade = CascadeType.ALL, orphanRemoval = true)
