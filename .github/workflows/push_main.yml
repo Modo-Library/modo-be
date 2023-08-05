@@ -19,7 +19,7 @@ env:
   DEPLOYMENT_GROUP_NAME: modo-deploy
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
