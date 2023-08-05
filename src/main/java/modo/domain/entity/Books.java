@@ -56,7 +56,6 @@ public class Books {
         this.imgUrl = imgUrl;
         this.createdAt = LocalDateTime.now();
         this.modifiedAt = LocalDateTime.now();
-
     }
 
     @ManyToOne
