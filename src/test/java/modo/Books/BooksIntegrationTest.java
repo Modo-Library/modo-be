@@ -2,7 +2,6 @@ package modo.Books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import modo.auth.JwtTokenProvider;
-import modo.domain.dto.books.BooksResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
@@ -10,8 +9,6 @@ import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
 import modo.enums.BooksStatus;
 import modo.repository.*;
-import modo.service.BooksService;
-import org.geolatte.geom.M;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,8 +35,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
-import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
-import static org.springframework.restdocs.request.RequestDocumentation.*;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -151,11 +148,13 @@ public class BooksIntegrationTest {
                                 fieldWithPath("name").description("Saving book's name").type(JsonFieldType.STRING),
                                 fieldWithPath("price").description("Saving book's price").type(JsonFieldType.NUMBER),
                                 fieldWithPath("status").description("Saving book's status").type(JsonFieldType.STRING),
-                                fieldWithPath("deadline").description("Saving book's deadline. If book is not on renting, this fields will be NULL").type(JsonFieldType.NULL),
+                                fieldWithPath("deadline").description("Saving book's deadline. If book is not on renting, this fields will be empty String").type(JsonFieldType.STRING),
                                 fieldWithPath("description").description("Saving book's description").type(JsonFieldType.STRING),
-                                fieldWithPath("imgUrl").description("Saving user's imgUrl").type(JsonFieldType.STRING),
-                                fieldWithPath("createdAt").description("Saving user's created LocalDateTime").type(JsonFieldType.STRING),
-                                fieldWithPath("modifiedAt").description("Saving user's modified LocalDateTime").type(JsonFieldType.STRING)
+                                fieldWithPath("imgUrl").description("Saving book's imgUrl").type(JsonFieldType.STRING),
+                                fieldWithPath("createdAt").description("Saving book's created LocalDateTime").type(JsonFieldType.STRING),
+                                fieldWithPath("modifiedAt").description("Saving book's modified LocalDateTime").type(JsonFieldType.STRING),
+                                fieldWithPath("latitude").description("Saving book's latitude").type(JsonFieldType.NUMBER),
+                                fieldWithPath("longitude").description("Saving book's longitude").type(JsonFieldType.NUMBER)
                         )))
                 .andDo(print());
     }
@@ -206,11 +205,13 @@ public class BooksIntegrationTest {
                                 fieldWithPath("name").description("Saving book's name").type(JsonFieldType.STRING),
                                 fieldWithPath("price").description("Saving book's price").type(JsonFieldType.NUMBER),
                                 fieldWithPath("status").description("Saving book's status").type(JsonFieldType.STRING),
-                                fieldWithPath("deadline").description("Saving book's deadline. If book is not on renting, this fields will be NULL").type(JsonFieldType.NULL),
+                                fieldWithPath("deadline").description("Saving book's deadline. If book is not on renting, this fields will be empty String").type(JsonFieldType.STRING),
                                 fieldWithPath("description").description("Saving book's description").type(JsonFieldType.STRING),
                                 fieldWithPath("imgUrl").description("Saving user's imgUrl").type(JsonFieldType.STRING),
                                 fieldWithPath("createdAt").description("Saving user's created LocalDateTime").type(JsonFieldType.STRING),
-                                fieldWithPath("modifiedAt").description("Saving user's modified LocalDateTime").type(JsonFieldType.STRING)
+                                fieldWithPath("modifiedAt").description("Saving user's modified LocalDateTime").type(JsonFieldType.STRING),
+                                fieldWithPath("latitude").description("Saving book's latitude").type(JsonFieldType.NUMBER),
+                                fieldWithPath("longitude").description("Saving book's longitude").type(JsonFieldType.NUMBER)
                         )))
                 .andDo(print());
     }
