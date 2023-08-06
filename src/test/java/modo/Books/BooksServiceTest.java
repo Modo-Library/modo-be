@@ -1,5 +1,6 @@
 package modo.Books;
 
+import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
@@ -15,6 +16,7 @@ import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
 import modo.service.BooksService;
 import modo.util.GeomUtil;
+import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
@@ -35,6 +37,7 @@ import static org.mockito.Mockito.when;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Log4j2
 public class BooksServiceTest {
 
     @Autowired
@@ -173,6 +176,43 @@ public class BooksServiceTest {
 
         // when + then : assertThrows
         assertThrows(UsersMismatchException.class, () -> booksService.delete(testBooksId, testAccessToken));
+    }
+
+    @Test
+    void Service_책거리조회_테스트() {
+
+        final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId(testUsersId)
+                .nickname(testNickname)
+                .latitude(37.28016)
+                .longitude(127.043705)
+                .build();
+
+        PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "1")
+                .filename(testFilename + "1")
+                .build();
+
+        PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "2")
+                .filename(testFilename + "2")
+                .build();
+
+        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
+        BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                .name(testName)
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId(testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .build();
+
+        usersRepository.save(testUsersSaveRequestDto.toEntity());
+        booksService.save(requestDto);
+        assertThat(booksRepository.findAll().get(0).calculateDistance(37.275806, 127.044909)).isCloseTo(495.723031, Percentage.withPercentage(99));
     }
 
     private void saveTestBooksAndPicturesList() {
