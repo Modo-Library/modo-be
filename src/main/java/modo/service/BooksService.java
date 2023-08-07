@@ -3,22 +3,22 @@ package modo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
-import modo.domain.dto.books.BooksResponseDto;
-import modo.domain.dto.books.BooksSaveRequestDto;
-import modo.domain.dto.books.BooksUpdateRequestDto;
+import modo.domain.dto.books.*;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.entity.Books;
-import modo.domain.entity.Pictures;
 import modo.domain.entity.Users;
 import modo.exception.booksException.UsersMismatchException;
 import modo.repository.BooksRepository;
 import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
-import modo.util.GeomUtil;
+import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -79,6 +79,25 @@ public class BooksService {
 
         target.getOwner().removeBooks(target);
         booksRepository.deleteById(booksId);
+    }
+
+    @Transactional(readOnly = true)
+    public BooksPageResponseDto findBooksByNameContainingWithDistanceWithPaging(String searchingWord, int page, String token) {
+        String usersId = jwtTokenProvider.getUsersId(token);
+        Point usersPoint = usersRepository.findPointById(usersId);
+
+        Page<Books> booksPage = booksRepository.findBooksByNameContainingWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), 0, searchingWord, PageRequest.of(page, 10));
+        int maxPages = booksPage.getTotalPages();
+        int curPages = booksPage.getNumber();
+        List<EachBooksPageResponseDto> booksList = booksPage.get()
+                .map(each -> new EachBooksPageResponseDto(each, usersPoint.getY(), usersPoint.getX()))
+                .collect(Collectors.toList());
+
+        return BooksPageResponseDto.builder()
+                .maxPage(maxPages)
+                .curPage(curPages)
+                .booksList(booksList)
+                .build();
     }
 
     private Books findBooksInRepository(Long booksId) {

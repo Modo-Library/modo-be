@@ -2,6 +2,7 @@ package modo.Books;
 
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.books.BooksPageResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
@@ -215,6 +216,86 @@ public class BooksServiceTest {
         assertThat(booksRepository.findAll().get(0).calculateDistance(37.275806, 127.044909)).isCloseTo(495.723031, Percentage.withPercentage(99));
     }
 
+    @Test
+    void Service_거리책조회_특정이름포함_페이지네이션_테스트() {
+
+        final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId(testUsersId)
+                .nickname(testNickname)
+                .latitude(37.275806)
+                .longitude(127.044909)
+                .build();
+
+        final UsersSaveRequestDto anotherTestUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId("another" + testUsersId)
+                .nickname(testNickname)
+                .latitude(37.28016)
+                .longitude(127.043705)
+                .build();
+
+        usersRepository.save(testUsersSaveRequestDto.toEntity());
+        usersRepository.save(anotherTestUsersSaveRequestDto.toEntity());
+
+        for (int i = 0; i < 15; i++) {
+            PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                    .imgUrl(testImgUrl + "1")
+                    .filename(testFilename + "1")
+                    .build();
+
+            PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                    .imgUrl(testImgUrl + "2")
+                    .filename(testFilename + "2")
+                    .build();
+
+            List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
+            BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                    .name(testName)
+                    .price(testPrice)
+                    .status(testStatus.toString())
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .usersId(testUsersId)
+                    .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                    .build();
+
+            booksService.save(requestDto);
+        }
+
+        for (int i = 0; i < 15; i++) {
+            PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
+                    .imgUrl(testImgUrl + "1")
+                    .filename(testFilename + "1")
+                    .build();
+
+            PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
+                    .imgUrl(testImgUrl + "2")
+                    .filename(testFilename + "2")
+                    .build();
+
+            List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
+
+            BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
+                    .name(anotherTestName)
+                    .price(testPrice)
+                    .status(testStatus.toString())
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .usersId(testUsersId)
+                    .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                    .build();
+
+            booksService.save(requestDto);
+        }
+
+        when(jwtTokenProvider.getUsersId(any())).thenReturn("another" + testUsersId);
+
+        BooksPageResponseDto result = booksService.findBooksByNameContainingWithDistanceWithPaging("스프링", 0, "dummyToken");
+        assertThat(result.getCurPage()).isEqualTo(0L);
+        assertThat(result.getMaxPage()).isEqualTo(2L);
+        assertThat(result.getBooksList().size()).isEqualTo(10);
+    }
+
     private void saveTestBooksAndPicturesList() {
         PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
                 .imgUrl(testImgUrl + "1")
@@ -243,6 +324,7 @@ public class BooksServiceTest {
     }
 
     static final String testName = "스프링으로 하는 마이크로서비스 구축";
+    static final String anotherTestName = "Real MySQL 8.0";
     static final Long testPrice = 40000L;
     static final BooksStatus testStatus = BooksStatus.AVAILABLE;
     static final String testDescription = "완전 새 책";

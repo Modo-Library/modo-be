@@ -12,6 +12,8 @@ public class GeomUtil {
     public static Point createPoint(double lat, double lon) {
         GeometryFactory geometryFactory = new GeometryFactory();
         // Due to the MySQL Point : Point(longitude, latitude)
+        // Point.getX() = longitude
+        // Point.getY() = latitude
         return geometryFactory.createPoint(new Coordinate(lon, lat));
     }
 
@@ -19,12 +21,6 @@ public class GeomUtil {
 
         double lat1 = point.getY();
         double lon1 = point.getX();
-
-        log.info(lat1);
-        log.info(lon1);
-
-        log.info(lat2);
-        log.info(lon2);
 
         double theta = lon1 - lon2;
         double dist = Math.sin(deg2rad(lat1)) * Math.sin(deg2rad(lat2)) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.cos(deg2rad(theta));
