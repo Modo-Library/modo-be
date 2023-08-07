@@ -1,5 +1,6 @@
 package modo.Books;
 
+import lombok.extern.log4j.Log4j2;
 import modo.domain.entity.Books;
 import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
@@ -13,6 +14,9 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
@@ -23,6 +27,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Log4j2
 public class BooksRepositoryTest {
 
     @Autowired
@@ -181,6 +186,83 @@ public class BooksRepositoryTest {
 
         result = booksRepository.findBooksByNameContainingWithDistance(1.5, 1.5, 1000, "2");
         assertThat(result.size()).isEqualTo(1);
+    }
+
+    @Test
+    void Repository_거리책조회_특정이름포함_페이지네이션_테스트() {
+        for (int i = 0; i < 15; i++) {
+            Books books = Books.builder()
+                    .name("testNameBook1")
+                    .price(testPrice)
+                    .status(testStatus)
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .build();
+            Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+            books.setLocation(testLocation);
+
+            booksRepository.save(books);
+        }
+
+        for (int i = 0; i < 15; i++) {
+            Books books = Books.builder()
+                    .name("ThisIsDummyBooks")
+                    .price(testPrice)
+                    .status(testStatus)
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .build();
+            Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+            books.setLocation(testLocation);
+
+            booksRepository.save(books);
+        }
+
+        Page<Books> result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 100000, "testName", PageRequest.of(0, 10));
+        assertThat(result.getContent().size()).isEqualTo(10);
+        log.info(result.getTotalElements());
+        log.info(result.getTotalPages());
+        log.info(result.getNumber());
+
+        result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 100000, "testName", PageRequest.of(1, 10));
+        assertThat(result.getContent().size()).isEqualTo(5);
+    }
+
+    @Test
+    void Repository_거리책조회_페이지네이션_테스트() {
+
+        for (int i = 0; i < 15; i++) {
+            Books books = Books.builder()
+                    .name("testNameBook1")
+                    .price(testPrice)
+                    .status(testStatus)
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .build();
+            Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+            books.setLocation(testLocation);
+
+            booksRepository.save(books);
+        }
+
+        for (int i = 0; i < 15; i++) {
+            Books books = Books.builder()
+                    .name("ThisIsDummyBooks")
+                    .price(testPrice)
+                    .status(testStatus)
+                    .description(testDescription)
+                    .imgUrl(testImgUrl)
+                    .build();
+            Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+            books.setLocation(testLocation);
+
+            booksRepository.save(books);
+        }
+
+        Page<Books> result = booksRepository.findBooksWithDistanceWithPaging(1.5, 1.5, 100000, PageRequest.of(0, 10));
+        assertThat(result.getTotalElements()).isEqualTo(30);
+        assertThat(result.getTotalPages()).isEqualTo(3);
+        assertThat(result.getContent().size()).isEqualTo(10);
     }
 
     // Test Users Information : static final variable

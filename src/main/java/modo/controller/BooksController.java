@@ -38,4 +38,13 @@ public class BooksController extends BaseController {
         return sendResponse();
     }
 
+    @GetMapping("/api/v1/books/getBooksList")
+    public ResponseEntity<?> getBooksList(@RequestParam(value = "pages") int pages, @RequestHeader(value = "token") String token) {
+        return sendResponse(booksService.findBooksWithDistanceWithPaging(pages, token));
+    }
+
+    @GetMapping("/api/v1/books/getBooksListWithSearching")
+    public ResponseEntity<?> getBooksListWithSearching(@RequestParam(value = "pages") int pages, @RequestParam(value = "keyword") String keyword, @RequestHeader(value = "token") String token) {
+        return sendResponse(booksService.findBooksByNameContainingWithDistanceWithPaging(keyword, pages, token));
+    }
 }

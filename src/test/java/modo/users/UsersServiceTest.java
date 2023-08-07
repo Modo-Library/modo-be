@@ -82,8 +82,8 @@ public class UsersServiceTest {
         assertThat(resultUsers.getNickname()).isEqualTo(testNickname);
         assertThat(resultUsers.getReviewCount()).isEqualTo(testReviewCount);
         assertThat(resultUsers.getReviewScore()).isEqualTo(testReviewScore);
-        assertThat(resultUsers.getLocation().getX()).isEqualTo(testX);
-        assertThat(resultUsers.getLocation().getY()).isEqualTo(testY);
+        assertThat(resultUsers.getLocation().getX()).isEqualTo(testY);
+        assertThat(resultUsers.getLocation().getY()).isEqualTo(testX);
         assertThat(resultUsers.getUsersReviewList().size()).isEqualTo(0);
         assertThat(resultUsers.getUsersHistory().getUsersId()).isEqualTo(testUsersId);
 

@@ -32,4 +32,21 @@ operation::Books-update[snippets='http-request,request-headers,request-fields,ht
 [[Books-delete]]
 == Books-delete
 
-operation::Books-delete[snippets='http-request,request-headers,request-fields,http-response,response-fields']
+operation::Books-delete[snippets='http-request,request-headers,query-parameters,http-response']
+
+[[Books-getBooksList]]
+== Books-getBooksList
+
+* 메인 페이지 처음 로드 시 아무런 검색어 없이 책 리스트를 조회하는 API 입니다.
+* 요청을 보낸 사용자의 등록된 위치를 기준으로 가까운 순서대로 정렬해서 리턴합니다.
+
+operation::Books-getBooksList[snippets='http-request,request-headers,query-parameters,http-response,response-fields']
+
+[[Books-getBooksListWithSearching]]
+== Books-getBooksListWithSearching
+
+* 특정 문자열을 포함한 검색 결과 책 리스트를 조회하는 API 입니다.
+* 요청을 보낸 사용자의 등록된 위치를 기준으로 가까운 순서대로 정렬해서 리턴합니다.
+* 검색한 문자열이 책 제목에 포함되어 있지 않은 경우에는 검색 결과에서 무조건 제외됩니다.
+
+operation::Books-getBooksListWithSearching[snippets='http-request,request-headers,query-parameters,http-response,response-fields']

@@ -1,6 +1,7 @@
 package modo.Books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
@@ -38,8 +39,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
 import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -48,6 +48,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(RestDocumentationExtension.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
+@Log4j2
 public class BooksIntegrationTest {
 
     @Autowired
@@ -207,9 +208,9 @@ public class BooksIntegrationTest {
                                 fieldWithPath("status").description("Saving book's status").type(JsonFieldType.STRING),
                                 fieldWithPath("deadline").description("Saving book's deadline. If book is not on renting, this fields will be empty String").type(JsonFieldType.STRING),
                                 fieldWithPath("description").description("Saving book's description").type(JsonFieldType.STRING),
-                                fieldWithPath("imgUrl").description("Saving user's imgUrl").type(JsonFieldType.STRING),
-                                fieldWithPath("createdAt").description("Saving user's created LocalDateTime").type(JsonFieldType.STRING),
-                                fieldWithPath("modifiedAt").description("Saving user's modified LocalDateTime").type(JsonFieldType.STRING),
+                                fieldWithPath("imgUrl").description("Saving book's imgUrl").type(JsonFieldType.STRING),
+                                fieldWithPath("createdAt").description("Saving book's created LocalDateTime").type(JsonFieldType.STRING),
+                                fieldWithPath("modifiedAt").description("Saving book's modified LocalDateTime").type(JsonFieldType.STRING),
                                 fieldWithPath("latitude").description("Saving book's latitude").type(JsonFieldType.NUMBER),
                                 fieldWithPath("longitude").description("Saving book's longitude").type(JsonFieldType.NUMBER)
                         )))
@@ -244,6 +245,124 @@ public class BooksIntegrationTest {
         assertThat(picturesRepository.findAll().size()).isZero();
     }
 
+    @Test
+    void Integration_책리스트조회_검색어사용및미사용_테스트() throws Exception {
+        UsersSaveRequestDto usersSaveRequestDto1 = UsersSaveRequestDto.builder()
+                .usersId("usersA")
+                .nickname("아주대학교 앞 사용자")
+                .latitude(37.279861)
+                .longitude(127.043852)
+                .build();
+
+        BooksSaveRequestDto booksSaveRequestDto1 = BooksSaveRequestDto.builder()
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl + "1")
+                .name("아주대학교 앞 사용자가 저장한 책입니다")
+                .usersId("usersA")
+                .price(1000L)
+                .build();
+
+        saveNewTestUsersAndCreateNewToken(usersSaveRequestDto1);
+        saveNewBooksAndPictures(booksSaveRequestDto1, accessToken);
+
+        UsersSaveRequestDto usersSaveRequestDto2 = UsersSaveRequestDto.builder()
+                .usersId("usersB")
+                .nickname("아주대학교 삼거리 사용자")
+                .latitude(37.274563)
+                .longitude(127.043984)
+                .build();
+
+        BooksSaveRequestDto booksSaveRequestDto2 = BooksSaveRequestDto.builder()
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl + "1")
+                .name("아주대학교 삼거리 사용자가 저장한 책입니다")
+                .usersId("usersB")
+                .price(2000L)
+                .build();
+
+        BooksSaveRequestDto booksSaveRequestDto3 = BooksSaveRequestDto.builder()
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl + "1")
+                .name("검색어를 사용해서 검색하는 경우 검색되지 않기 위해서 추가되는 책입니다")
+                .usersId("usersB")
+                .price(2000L)
+                .build();
+
+        saveNewTestUsersAndCreateNewToken(usersSaveRequestDto2);
+        saveNewBooksAndPictures(booksSaveRequestDto2, accessToken);
+        saveNewBooksAndPictures(booksSaveRequestDto3, accessToken);
+
+        saveNewTestUsersAndCreateNewToken();
+
+        mockMvc.perform(get("/api/v1/books/getBooksList")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                        .queryParam("pages", "0")
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Books-getBooksList",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        queryParameters(
+                                parameterWithName("pages").description("Pages Number for search")
+                        ),
+                        requestHeaders(
+                                headerWithName("token").description("Access token value")
+                        ),
+                        responseFields(
+                                fieldWithPath("maxPage").description("Max Page for result").type(JsonFieldType.NUMBER),
+                                fieldWithPath("curPage").description("Cur Page for result, start from 0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList").description("Result books list").type(JsonFieldType.ARRAY),
+                                fieldWithPath("booksList.[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList.[].name").description("Each book's name").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].price").description("Each book's price").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList.[].status").description("Each book's status").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].description").description("Each book's description").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
+                        )
+                ))
+                .andDo(print());
+
+        mockMvc.perform(get("/api/v1/books/getBooksListWithSearching")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                        .queryParam("pages", "0")
+                        .queryParam("keyword", "아주대학교")
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Books-getBooksListWithSearching",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        queryParameters(
+                                parameterWithName("pages").description("Pages Number for search"),
+                                parameterWithName("keyword").description("Keyword for search")
+                        ),
+                        requestHeaders(
+                                headerWithName("token").description("Access token value")
+                        ),
+                        responseFields(
+                                fieldWithPath("maxPage").description("Max Page for result").type(JsonFieldType.NUMBER),
+                                fieldWithPath("curPage").description("Cur Page for result, start from 0").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList").description("Result books list").type(JsonFieldType.ARRAY),
+                                fieldWithPath("booksList.[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList.[].name").description("Each book's name").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].price").description("Each book's price").type(JsonFieldType.NUMBER),
+                                fieldWithPath("booksList.[].status").description("Each book's status").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].description").description("Each book's description").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
+                                fieldWithPath("booksList.[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
+                        )
+                ))
+                .andDo(print());
+    }
+
 
     private void saveNewTestUsersAndCreateNewToken() throws Exception {
         mockMvc.perform(post("/api/v2/users/save")
@@ -257,6 +376,19 @@ public class BooksIntegrationTest {
         refreshToken = jwtTokenProvider.createRefreshToken(testUsersId);
     }
 
+    private void saveNewTestUsersAndCreateNewToken(UsersSaveRequestDto requestDto) throws Exception {
+        mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        accessToken = jwtTokenProvider.createAccessToken(requestDto.getUsersId());
+        refreshToken = jwtTokenProvider.createRefreshToken(requestDto.getUsersId());
+    }
+
+
     private void saveNewBooksAndPictures() throws Exception {
         mockMvc.perform(post("/api/v1/books/save")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -269,11 +401,23 @@ public class BooksIntegrationTest {
         books = booksRepository.findAll().get(0);
     }
 
+    private void saveNewBooksAndPictures(BooksSaveRequestDto requestDto, String accessToken) throws Exception {
+        mockMvc.perform(post("/api/v1/books/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requestDto))
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(print());
+
+        books = booksRepository.findAll().get(0);
+    }
+
 
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";
-    static final double testX = 1.1;
-    static final double testY = 2.2;
+    static final double testX = 37.281312;
+    static final double testY = 127.043593;
     static final double testReviewScore = 0.0;
     static final Long testReviewCount = 0L;
 
