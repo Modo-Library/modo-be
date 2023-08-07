@@ -180,7 +180,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void Service_책거리조회_테스트() {
+    void Service_책리스트조회_테스트() {
 
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
                 .usersId(testUsersId)
@@ -217,7 +217,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void Service_책조회_특정이름포함및미포함_페이지네이션_테스트() {
+    void Service_책리스트트회_특정이름포함및미포함_페이지네이션_테스트() {
 
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
                 .usersId(testUsersId)
@@ -303,7 +303,7 @@ public class BooksServiceTest {
 
 
     @Test
-    void Service_책조회_거리순서정렬및필터링_페이지네이션_테스트() {
+    void Service_책리스트조회_거리순서정렬및필터링_페이지네이션_테스트() {
 
         // 아주대학교 앞 사용자
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
