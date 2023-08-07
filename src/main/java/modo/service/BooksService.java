@@ -87,8 +87,22 @@ public class BooksService {
         Point usersPoint = usersRepository.findPointById(usersId);
 
         Page<Books> booksPage = booksRepository.findBooksByNameContainingWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), 0, searchingWord, PageRequest.of(page, 10));
+        return getBooksPageResponseDto(usersPoint, booksPage);
+    }
+
+    @Transactional(readOnly = true)
+    public BooksPageResponseDto findBooksWithDistanceWithPaging(int page, String token) {
+        String usersId = jwtTokenProvider.getUsersId(token);
+        Point usersPoint = usersRepository.findPointById(usersId);
+
+        Page<Books> booksPage = booksRepository.findBooksWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), 0, PageRequest.of(page, 10));
+        return getBooksPageResponseDto(usersPoint, booksPage);
+    }
+
+    private BooksPageResponseDto getBooksPageResponseDto(Point usersPoint, Page<Books> booksPage) {
         int maxPages = booksPage.getTotalPages();
         int curPages = booksPage.getNumber();
+
         List<EachBooksPageResponseDto> booksList = booksPage.get()
                 .map(each -> new EachBooksPageResponseDto(each, usersPoint.getY(), usersPoint.getX()))
                 .collect(Collectors.toList());

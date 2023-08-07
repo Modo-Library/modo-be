@@ -217,7 +217,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void Service_거리책조회_특정이름포함_페이지네이션_테스트() {
+    void Service_거리책조회_특정이름포함및미포함_페이지네이션_테스트() {
 
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
                 .usersId(testUsersId)
@@ -293,6 +293,11 @@ public class BooksServiceTest {
         BooksPageResponseDto result = booksService.findBooksByNameContainingWithDistanceWithPaging("스프링", 0, "dummyToken");
         assertThat(result.getCurPage()).isEqualTo(0L);
         assertThat(result.getMaxPage()).isEqualTo(2L);
+        assertThat(result.getBooksList().size()).isEqualTo(10);
+
+        result = booksService.findBooksWithDistanceWithPaging(0, "dummyToken");
+        assertThat(result.getCurPage()).isEqualTo(0L);
+        assertThat(result.getMaxPage()).isEqualTo(3L);
         assertThat(result.getBooksList().size()).isEqualTo(10);
     }
 
