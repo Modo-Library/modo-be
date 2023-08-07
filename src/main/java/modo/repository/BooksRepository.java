@@ -32,7 +32,7 @@ public interface BooksRepository extends JpaRepository<Books, Long> {
             "ST_Distance_Sphere(point(:x,:y),b.location) AS diff_Distance " +
             "FROM books AS b " +
             "WHERE ST_Distance_Sphere(point(:x,:y),b.location) <= :distance " +
-            "ORDER BY diff_Distance", nativeQuery = true)
+            "ORDER BY diff_Distance ASC", nativeQuery = true)
     Page<Books> findBooksWithDistanceWithPaging(double x, double y, double distance, Pageable pageable);
 
     @Query(value = "SELECT b.books_id, b.name, b.price, b.status, b.deadline, b.description, b.img_url, b.created_at, b.modified_at, b.location, b.users_id, " +
@@ -40,6 +40,6 @@ public interface BooksRepository extends JpaRepository<Books, Long> {
             "FROM books AS b " +
             "WHERE ST_Distance_Sphere(point(:x,:y),b.location) <= :distance " +
             "AND b.name LIKE CONCAT('%', :queryString, '%') " +
-            "ORDER BY diff_Distance", nativeQuery = true)
+            "ORDER BY diff_Distance ASC", nativeQuery = true)
     Page<Books> findBooksByNameContainingWithDistanceWithPaging(double x, double y, double distance, String queryString, Pageable pageable);
 }

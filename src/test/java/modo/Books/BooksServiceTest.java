@@ -217,7 +217,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void Service_거리책조회_특정이름포함및미포함_페이지네이션_테스트() {
+    void Service_책조회_특정이름포함및미포함_페이지네이션_테스트() {
 
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
                 .usersId(testUsersId)
@@ -299,6 +299,83 @@ public class BooksServiceTest {
         assertThat(result.getCurPage()).isEqualTo(0L);
         assertThat(result.getMaxPage()).isEqualTo(3L);
         assertThat(result.getBooksList().size()).isEqualTo(10);
+    }
+
+
+    @Test
+    void Service_책조회_거리순서정렬및필터링_페이지네이션_테스트() {
+
+        // 아주대학교 앞 사용자
+        final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId(testUsersId)
+                .nickname(testNickname)
+                .latitude(37.275806)
+                .longitude(127.044909)
+                .build();
+
+        // 아주대학교 정문 사용자
+        final UsersSaveRequestDto anotherTestUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId("another" + testUsersId)
+                .nickname(testNickname)
+                .latitude(37.28016)
+                .longitude(127.043705)
+                .build();
+
+        // 인계동 사용자
+        final UsersSaveRequestDto otherTestUsersSaveRequestDto = UsersSaveRequestDto.builder()
+                .usersId("other" + testUsersId)
+                .nickname(testNickname)
+                .latitude(37.261718)
+                .longitude(127.031914)
+                .build();
+
+        usersRepository.save(testUsersSaveRequestDto.toEntity());
+        usersRepository.save(anotherTestUsersSaveRequestDto.toEntity());
+        usersRepository.save(otherTestUsersSaveRequestDto.toEntity());
+
+        PicturesSaveRequestDto picturesSaveRequestDto = PicturesSaveRequestDto.builder()
+                .imgUrl(testImgUrl + "1")
+                .filename(testFilename + "1")
+                .build();
+
+        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(picturesSaveRequestDto);
+
+        BooksSaveRequestDto requestDto1 = BooksSaveRequestDto.builder()
+                .name("아주대학교 앞에서 저장한 사용자의 책")
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId(testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .build();
+
+        BooksSaveRequestDto requestDto2 = BooksSaveRequestDto.builder()
+                .name("아주대학교 정문에서 저장한 사용자의 책")
+                .price(testPrice)
+                .status(testStatus.toString())
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .usersId("another" + testUsersId)
+                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
+                .build();
+
+        booksService.save(requestDto1);
+        booksService.save(requestDto2);
+
+        when(jwtTokenProvider.getUsersId(any())).thenReturn("other" + testUsersId);
+
+        BooksPageResponseDto result = booksService.findBooksWithDistanceWithPaging(0, "dummyToken");
+        assertThat(result.getCurPage()).isEqualTo(0L);
+        assertThat(result.getMaxPage()).isEqualTo(1L);
+
+        log.info(result.getBooksList().get(0).getDistance());
+        log.info(result.getBooksList().get(0).getName());
+        log.info(result.getBooksList().get(1).getDistance());
+        log.info(result.getBooksList().get(1).getName());
+
+        assertThat(result.getBooksList().get(0).getName()).isEqualTo("아주대학교 앞에서 저장한 사용자의 책");
+        assertThat(result.getBooksList().get(1).getName()).isEqualTo("아주대학교 정문에서 저장한 사용자의 책");
     }
 
     private void saveTestBooksAndPicturesList() {
