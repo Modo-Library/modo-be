@@ -5,8 +5,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Optional;
 
 public interface BooksRepository extends JpaRepository<Books, Long> {
 
@@ -42,4 +45,7 @@ public interface BooksRepository extends JpaRepository<Books, Long> {
             "AND b.name LIKE CONCAT('%', :queryString, '%') " +
             "ORDER BY diff_Distance ASC", nativeQuery = true)
     Page<Books> findBooksByNameContainingWithDistanceWithPaging(double x, double y, double distance, String queryString, Pageable pageable);
+
+    @Query("select b from Books b left join fetch b.picturesList where b.booksId = :booksId")
+    Optional<Books> findBooks(@Param("booksId") Long booksId);
 }

@@ -265,6 +265,27 @@ public class BooksRepositoryTest {
         assertThat(result.getContent().size()).isEqualTo(10);
     }
 
+    @Test
+    void Repository_책상세조회_테스트() {
+        Books books = Books.builder()
+                .name("testNameBook1")
+                .price(testPrice)
+                .status(testStatus)
+                .description(testDescription)
+                .imgUrl(testImgUrl)
+                .build();
+
+        Point testLocation = GeomUtil.createPoint(1.1, 2.2);
+        books.setLocation(testLocation);
+
+        booksRepository.save(books);
+
+        Books result = booksRepository.findBooks(booksRepository.findAll().get(0).getBooksId())
+                .orElseThrow(() -> new IllegalArgumentException(""));
+
+        assertThat(result.getName()).isEqualTo("testNameBook1");
+    }
+
     // Test Users Information : static final variable
     static final String testUsersId = "testUsersId";
     static final String testPassword = "testPassword";
