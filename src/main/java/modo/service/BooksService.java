@@ -30,6 +30,8 @@ public class BooksService {
 
     private final JwtTokenProvider jwtTokenProvider;
 
+    static final Long searchingDistance = 3000L;
+
     @Transactional
     public BooksResponseDto save(BooksSaveRequestDto booksSaveRequestDto) {
         // Make books entity with booksSaveRequestDto
@@ -86,7 +88,7 @@ public class BooksService {
         String usersId = jwtTokenProvider.getUsersId(token);
         Point usersPoint = usersRepository.findPointById(usersId);
 
-        Page<Books> booksPage = booksRepository.findBooksByNameContainingWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), 0, searchingWord, PageRequest.of(page, 10));
+        Page<Books> booksPage = booksRepository.findBooksByNameContainingWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), searchingDistance, searchingWord, PageRequest.of(page, 10));
         return getBooksPageResponseDto(usersPoint, booksPage);
     }
 
@@ -95,7 +97,7 @@ public class BooksService {
         String usersId = jwtTokenProvider.getUsersId(token);
         Point usersPoint = usersRepository.findPointById(usersId);
 
-        Page<Books> booksPage = booksRepository.findBooksWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), 0, PageRequest.of(page, 10));
+        Page<Books> booksPage = booksRepository.findBooksWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), searchingDistance, PageRequest.of(page, 10));
         return getBooksPageResponseDto(usersPoint, booksPage);
     }
 

@@ -50,8 +50,8 @@ public class UsersRepositoryTest {
         assertThat(target.getUsersId()).isEqualTo(testUsersId);
         assertThat(target.getNickname()).isEqualTo(testNickname);
         assertThat(target.getReviewScore()).isEqualTo(testReviewScore);
-        assertThat(target.getLocation().getX()).isEqualTo(testX);
-        assertThat(target.getLocation().getY()).isEqualTo(testY);
+        assertThat(target.getLocation().getX()).isEqualTo(testY);
+        assertThat(target.getLocation().getY()).isEqualTo(testX);
         assertThat(target.getReviewCount()).isEqualTo(testReviewCount);
     }
 

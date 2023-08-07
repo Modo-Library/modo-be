@@ -218,13 +218,13 @@ public class BooksRepositoryTest {
             booksRepository.save(books);
         }
 
-        Page<Books> result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 0, "testName", PageRequest.of(0, 10));
+        Page<Books> result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 100000, "testName", PageRequest.of(0, 10));
         assertThat(result.getContent().size()).isEqualTo(10);
         log.info(result.getTotalElements());
         log.info(result.getTotalPages());
         log.info(result.getNumber());
 
-        result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 0, "testName", PageRequest.of(1, 10));
+        result = booksRepository.findBooksByNameContainingWithDistanceWithPaging(1.5, 1.5, 100000, "testName", PageRequest.of(1, 10));
         assertThat(result.getContent().size()).isEqualTo(5);
     }
 
@@ -259,7 +259,7 @@ public class BooksRepositoryTest {
             booksRepository.save(books);
         }
 
-        Page<Books> result = booksRepository.findBooksWithDistanceWithPaging(1.5, 1.5, 0, PageRequest.of(0, 10));
+        Page<Books> result = booksRepository.findBooksWithDistanceWithPaging(1.5, 1.5, 100000, PageRequest.of(0, 10));
         assertThat(result.getTotalElements()).isEqualTo(30);
         assertThat(result.getTotalPages()).isEqualTo(3);
         assertThat(result.getContent().size()).isEqualTo(10);
