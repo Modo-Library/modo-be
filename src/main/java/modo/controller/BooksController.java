@@ -3,7 +3,6 @@ package modo.controller;
 import lombok.RequiredArgsConstructor;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
-import modo.enums.BooksStatus;
 import modo.service.BooksService;
 import modo.service.S3Service;
 import org.springframework.http.ResponseEntity;
@@ -39,12 +38,8 @@ public class BooksController extends BaseController {
     }
 
     @GetMapping("/api/v1/books/getBooksList")
-    public ResponseEntity<?> getBooksList(@RequestParam(value = "pages") int pages, @RequestHeader(value = "token") String token) {
-        return sendResponse(booksService.findBooksWithDistanceWithPaging(pages, token));
+    public ResponseEntity<?> getBooksList(@RequestHeader(value = "token") String token, @RequestParam(value = "startDistance") int startDistance, @RequestParam(value = "startId") Long startId, @RequestParam(value = "searchingWord") String searchingWord) {
+        return sendResponse(booksService.findBooksList(token, startDistance, startId, searchingWord));
     }
 
-    @GetMapping("/api/v1/books/getBooksListWithSearching")
-    public ResponseEntity<?> getBooksListWithSearching(@RequestParam(value = "pages") int pages, @RequestParam(value = "keyword") String keyword, @RequestHeader(value = "token") String token) {
-        return sendResponse(booksService.findBooksByNameContainingWithDistanceWithPaging(keyword, pages, token));
-    }
 }

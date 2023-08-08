@@ -1,10 +1,12 @@
 package modo.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.enums.BooksStatus;
-import modo.util.GeomUtil;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
@@ -78,10 +80,6 @@ public class Books {
         setDescription(requestDto.getDescription());
         setImgUrl(requestDto.getImgUrl());
         setModifiedAt(LocalDateTime.now());
-    }
-
-    public double calculateDistance(double lat2, double lon2) {
-        return GeomUtil.calculateDistance(this.getLocation(), lat2, lon2);
     }
 
     public boolean isNotOwnerId(String usersId) {

@@ -303,61 +303,61 @@ public class BooksIntegrationTest {
         mockMvc.perform(get("/api/v1/books/getBooksList")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("token", accessToken)
-                        .queryParam("pages", "0")
+                        .queryParam("startDistance", "0")
+                        .queryParam("startId", "1")
+                        .queryParam("searchingWord", "")
                 )
                 .andExpect(status().isOk())
                 .andDo(document("Books-getBooksList",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         queryParameters(
-                                parameterWithName("pages").description("Pages Number for search")
+                                parameterWithName("startDistance").description("Starting Distance for search"),
+                                parameterWithName("startId").description("Starting Id for search"),
+                                parameterWithName("searchingWord").description("Keyword for search. If keyword is empty string, will return result without searching")
                         ),
                         requestHeaders(
                                 headerWithName("token").description("Access token value")
                         ),
                         responseFields(
-                                fieldWithPath("maxPage").description("Max Page for result").type(JsonFieldType.NUMBER),
-                                fieldWithPath("curPage").description("Cur Page for result, start from 0").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList").description("Result books list").type(JsonFieldType.ARRAY),
-                                fieldWithPath("booksList.[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList.[].name").description("Each book's name").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].price").description("Each book's price").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList.[].status").description("Each book's status").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].description").description("Each book's description").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
+                                fieldWithPath("[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
+                                fieldWithPath("[].name").description("Each book's name").type(JsonFieldType.STRING),
+                                fieldWithPath("[].price").description("Each book's price").type(JsonFieldType.NUMBER),
+                                fieldWithPath("[].status").description("Each book's status").type(JsonFieldType.STRING),
+                                fieldWithPath("[].description").description("Each book's description").type(JsonFieldType.STRING),
+                                fieldWithPath("[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
+                                fieldWithPath("[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
                         )
                 ))
                 .andDo(print());
 
-        mockMvc.perform(get("/api/v1/books/getBooksListWithSearching")
+        mockMvc.perform(get("/api/v1/books/getBooksList")
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("token", accessToken)
-                        .queryParam("pages", "0")
-                        .queryParam("keyword", "아주대학교")
+                        .queryParam("startDistance", "0")
+                        .queryParam("startId", "1")
+                        .queryParam("searchingWord", "아주대학교")
                 )
                 .andExpect(status().isOk())
-                .andDo(document("Books-getBooksListWithSearching",
+                .andDo(document("Books-getBooksList_WithSearching",
                         Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
                         Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
                         queryParameters(
-                                parameterWithName("pages").description("Pages Number for search"),
-                                parameterWithName("keyword").description("Keyword for search")
+                                parameterWithName("startDistance").description("Starting Distance for search"),
+                                parameterWithName("startId").description("Starting Id for search"),
+                                parameterWithName("searchingWord").description("Keyword for search")
                         ),
                         requestHeaders(
                                 headerWithName("token").description("Access token value")
                         ),
                         responseFields(
-                                fieldWithPath("maxPage").description("Max Page for result").type(JsonFieldType.NUMBER),
-                                fieldWithPath("curPage").description("Cur Page for result, start from 0").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList").description("Result books list").type(JsonFieldType.ARRAY),
-                                fieldWithPath("booksList.[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList.[].name").description("Each book's name").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].price").description("Each book's price").type(JsonFieldType.NUMBER),
-                                fieldWithPath("booksList.[].status").description("Each book's status").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].description").description("Each book's description").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
-                                fieldWithPath("booksList.[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
+                                fieldWithPath("[].booksId").description("Each book's booksId").type(JsonFieldType.NUMBER),
+                                fieldWithPath("[].name").description("Each book's name").type(JsonFieldType.STRING),
+                                fieldWithPath("[].price").description("Each book's price").type(JsonFieldType.NUMBER),
+                                fieldWithPath("[].status").description("Each book's status").type(JsonFieldType.STRING),
+                                fieldWithPath("[].description").description("Each book's description").type(JsonFieldType.STRING),
+                                fieldWithPath("[].imgUrl").description("Each book's imgUrl_Thumbnail").type(JsonFieldType.STRING),
+                                fieldWithPath("[].distance").description("Each book's distance from each users(owner of accessToken)").type(JsonFieldType.NUMBER)
                         )
                 ))
                 .andDo(print());
