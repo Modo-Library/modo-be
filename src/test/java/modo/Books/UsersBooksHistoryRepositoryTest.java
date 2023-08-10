@@ -38,12 +38,16 @@ public class UsersBooksHistoryRepositoryTest {
     @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
+    @Autowired
+    PicturesRepository picturesRepository;
+
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
         usersReviewRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
-        usersRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
+        usersRepository.deleteAllInBatch();
         usersBooksHistoryRepository.deleteAllInBatch();
     }
 

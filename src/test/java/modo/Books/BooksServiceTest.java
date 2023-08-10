@@ -57,6 +57,7 @@ public class BooksServiceTest {
 
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
     }
 

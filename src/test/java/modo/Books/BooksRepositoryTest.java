@@ -6,6 +6,7 @@ import modo.domain.entity.Books;
 import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
+import modo.repository.PicturesRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
@@ -38,11 +39,15 @@ public class BooksRepositoryTest {
     @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
+    @Autowired
+    PicturesRepository picturesRepository;
+
     @BeforeEach
     void tearDown() {
         usersHistoryRepository.deleteAllInBatch();
-        usersRepository.deleteAllInBatch();
+        picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
+        usersRepository.deleteAllInBatch();
     }
 
     @Test

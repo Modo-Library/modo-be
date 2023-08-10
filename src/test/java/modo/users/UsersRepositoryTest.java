@@ -1,6 +1,8 @@
 package modo.users;
 
 import modo.domain.entity.Users;
+import modo.repository.BooksRepository;
+import modo.repository.PicturesRepository;
 import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
@@ -25,9 +27,17 @@ public class UsersRepositoryTest {
     @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
+    @Autowired
+    BooksRepository booksRepository;
+
+    @Autowired
+    PicturesRepository picturesRepository;
+
 
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
+        booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
     }
