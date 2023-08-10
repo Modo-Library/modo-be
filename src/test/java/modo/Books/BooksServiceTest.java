@@ -2,9 +2,10 @@ package modo.Books;
 
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
-import modo.domain.dto.books.BooksPageResponseDto;
+import modo.domain.dto.books.BooksDetailResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
+import modo.domain.dto.books.EachBooksResponseDto;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
 import modo.domain.entity.Books;
@@ -17,7 +18,6 @@ import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
 import modo.service.BooksService;
 import modo.util.GeomUtil;
-import org.assertj.core.data.Percentage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.locationtech.jts.geom.Point;
@@ -57,6 +57,7 @@ public class BooksServiceTest {
 
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
     }
 
@@ -107,7 +108,7 @@ public class BooksServiceTest {
         assertThat(targetBooks.getImgUrl()).isEqualTo(testImgUrl);
         assertThat(targetBooks.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(targetBooks.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(targetBooks.getDeadline()).isNull();
+        assertThat(targetBooks.getDeadline()).isBeforeOrEqualTo(LocalDateTime.now());
 
         assertThat(targetUsers.getBooksList().size()).isEqualTo(1);
         assertThat(targetUsers.getBooksList().get(0).getName()).isEqualTo(testName);
@@ -180,44 +181,7 @@ public class BooksServiceTest {
     }
 
     @Test
-    void Service_책리스트조회_테스트() {
-
-        final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
-                .usersId(testUsersId)
-                .nickname(testNickname)
-                .latitude(37.28016)
-                .longitude(127.043705)
-                .build();
-
-        PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
-                .imgUrl(testImgUrl + "1")
-                .filename(testFilename + "1")
-                .build();
-
-        PicturesSaveRequestDto requestDto2 = PicturesSaveRequestDto.builder()
-                .imgUrl(testImgUrl + "2")
-                .filename(testFilename + "2")
-                .build();
-
-        List<PicturesSaveRequestDto> picturesSaveRequestDtoList = List.of(requestDto1, requestDto2);
-
-        BooksSaveRequestDto requestDto = BooksSaveRequestDto.builder()
-                .name(testName)
-                .price(testPrice)
-                .status(testStatus.toString())
-                .description(testDescription)
-                .imgUrl(testImgUrl)
-                .usersId(testUsersId)
-                .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
-                .build();
-
-        usersRepository.save(testUsersSaveRequestDto.toEntity());
-        booksService.save(requestDto);
-        assertThat(booksRepository.findAll().get(0).calculateDistance(37.275806, 127.044909)).isCloseTo(495.723031, Percentage.withPercentage(99));
-    }
-
-    @Test
-    void Service_책리스트트회_특정이름포함및미포함_페이지네이션_테스트() {
+    void Service_책리스트조회_특정이름포함_페이지네이션_테스트() {
 
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
                 .usersId(testUsersId)
@@ -290,20 +254,30 @@ public class BooksServiceTest {
 
         when(jwtTokenProvider.getUsersId(any())).thenReturn("another" + testUsersId);
 
-        BooksPageResponseDto result = booksService.findBooksByNameContainingWithDistanceWithPaging("스프링", 0, "dummyToken");
-        assertThat(result.getCurPage()).isEqualTo(0L);
-        assertThat(result.getMaxPage()).isEqualTo(2L);
-        assertThat(result.getBooksList().size()).isEqualTo(10);
+        List<EachBooksResponseDto> result = booksService.findBooksList("dummyToken", 0, 1L, "스프링");
+        assertThat(result.size()).isEqualTo(10);
 
-        result = booksService.findBooksWithDistanceWithPaging(0, "dummyToken");
-        assertThat(result.getCurPage()).isEqualTo(0L);
-        assertThat(result.getMaxPage()).isEqualTo(3L);
-        assertThat(result.getBooksList().size()).isEqualTo(10);
+        result.stream()
+                .forEach(each -> {
+                    log.info("id : {}, name : {}, distance : {}", each.getBooksId(), each.getName(), each.getDistance());
+                });
+
+        Long startId = result.get(9).getBooksId();
+        int startDistance = result.get(9).getDistance();
+
+        log.info("startId : {}, startDistance : {}", startId, startDistance);
+
+        result = booksService.findBooksList("dummyToken", startDistance, startId, "스프링");
+        result.stream()
+                .forEach(each -> {
+                    log.info("id : {}, name : {}, distance : {}", each.getBooksId(), each.getName(), each.getDistance());
+                });
+        assertThat(result.size()).isEqualTo(5);
     }
 
 
     @Test
-    void Service_책리스트조회_거리순서정렬및필터링_페이지네이션_테스트() {
+    void Service_책리스트조회_특정이름미포함_페이지네이션_테스트() {
 
         // 아주대학교 앞 사용자
         final UsersSaveRequestDto testUsersSaveRequestDto = UsersSaveRequestDto.builder()
@@ -365,17 +339,24 @@ public class BooksServiceTest {
 
         when(jwtTokenProvider.getUsersId(any())).thenReturn("other" + testUsersId);
 
-        BooksPageResponseDto result = booksService.findBooksWithDistanceWithPaging(0, "dummyToken");
-        assertThat(result.getCurPage()).isEqualTo(0L);
-        assertThat(result.getMaxPage()).isEqualTo(1L);
+        List<EachBooksResponseDto> result = booksService.findBooksList("dummyToken", 0, 1L, "");
 
-        log.info(result.getBooksList().get(0).getDistance());
-        log.info(result.getBooksList().get(0).getName());
-        log.info(result.getBooksList().get(1).getDistance());
-        log.info(result.getBooksList().get(1).getName());
+        assertThat(result.get(0).getName()).isEqualTo("아주대학교 앞에서 저장한 사용자의 책");
+        assertThat(result.get(1).getName()).isEqualTo("아주대학교 정문에서 저장한 사용자의 책");
+    }
 
-        assertThat(result.getBooksList().get(0).getName()).isEqualTo("아주대학교 앞에서 저장한 사용자의 책");
-        assertThat(result.getBooksList().get(1).getName()).isEqualTo("아주대학교 정문에서 저장한 사용자의 책");
+    @Test
+    void Service_책상세조회_테스트() {
+        saveTestBooksAndPicturesList();
+        Long booksId = booksRepository.findAll().get(0).getBooksId();
+
+        BooksDetailResponseDto target = booksService.findBooks(booksId);
+
+        assertThat(target.getDescription()).isEqualTo(testDescription);
+        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
+        assertThat(target.getDeadline()).isEqualTo("");
+        assertThat(target.getPicturesList().size()).isEqualTo(2);
+        assertThat(target.getPicturesList().get(0).getImgUrl()).isEqualTo(testImgUrl + "1");
     }
 
     private void saveTestBooksAndPicturesList() {

@@ -11,9 +11,7 @@ import modo.domain.entity.Users;
 import modo.domain.entity.UsersHistory;
 import modo.domain.entity.UsersReview;
 import modo.enums.UsersHistoryAddRequestType;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
-import modo.repository.UsersReviewRepository;
+import modo.repository.*;
 import modo.service.UsersService;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +41,12 @@ public class UsersServiceTest {
     @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
+    @Autowired
+    BooksRepository booksRepository;
+
+    @Autowired
+    PicturesRepository picturesRepository;
+
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
@@ -50,6 +54,8 @@ public class UsersServiceTest {
 
     @BeforeEach
     void tearDown() {
+        picturesRepository.deleteAllInBatch();
+        booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
     }

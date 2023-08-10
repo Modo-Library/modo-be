@@ -43,9 +43,9 @@ public class PicturesRepositoryTest {
     @BeforeEach
     void tearDown() {
         usersHistoryRepository.deleteAllInBatch();
-        usersRepository.deleteAllInBatch();
-        booksRepository.deleteAllInBatch();
         picturesRepository.deleteAllInBatch();
+        booksRepository.deleteAllInBatch();
+        usersRepository.deleteAllInBatch();
     }
 
     @Test

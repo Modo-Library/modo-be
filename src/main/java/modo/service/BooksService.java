@@ -12,8 +12,6 @@ import modo.repository.BooksRepository;
 import modo.repository.PicturesRepository;
 import modo.repository.UsersRepository;
 import org.locationtech.jts.geom.Point;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -84,36 +82,41 @@ public class BooksService {
     }
 
     @Transactional(readOnly = true)
-    public BooksPageResponseDto findBooksByNameContainingWithDistanceWithPaging(String searchingWord, int page, String token) {
+    public List<EachBooksResponseDto> findBooksList(String token, int startDistance, Long startId, String searchingWord) {
+        return switch (searchingWord) {
+            case "" -> findBooksWithDistanceWithNoOffset(token, startDistance, startId);
+            default -> findBooksByNameContainingWithDistanceWithNoOffset(token, startDistance, startId, searchingWord);
+        };
+    }
+
+    private List<EachBooksResponseDto> findBooksWithDistanceWithNoOffset(String token, int startDistance, Long startId) {
+
         String usersId = jwtTokenProvider.getUsersId(token);
         Point usersPoint = usersRepository.findPointById(usersId);
 
-        Page<Books> booksPage = booksRepository.findBooksByNameContainingWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), searchingDistance, searchingWord, PageRequest.of(page, 10));
-        return getBooksPageResponseDto(usersPoint, booksPage);
+        return booksRepository.findBooksWithDistanceWithNoOffset(usersPoint.getX(), usersPoint.getY(), searchingDistance, startDistance, startId)
+                .stream()
+                .map(each -> new EachBooksResponseDto(each))
+                .collect(Collectors.toList());
+    }
+
+    private List<EachBooksResponseDto> findBooksByNameContainingWithDistanceWithNoOffset(String token, int startDistance, Long startId, String searchingWord) {
+        String usersId = jwtTokenProvider.getUsersId(token);
+        Point usersPoint = usersRepository.findPointById(usersId);
+
+        return booksRepository.findBooksByNameContainingWithDistanceWithNoOffset(usersPoint.getX(), usersPoint.getY(), searchingDistance, searchingWord, startDistance, startId)
+                .stream()
+                .map(each -> new EachBooksResponseDto(each))
+                .collect(Collectors.toList());
     }
 
     @Transactional(readOnly = true)
-    public BooksPageResponseDto findBooksWithDistanceWithPaging(int page, String token) {
-        String usersId = jwtTokenProvider.getUsersId(token);
-        Point usersPoint = usersRepository.findPointById(usersId);
+    public BooksDetailResponseDto findBooks(Long booksId) {
+        Books target = booksRepository.findBooks(booksId).orElseThrow(
+                () -> new IllegalArgumentException("Books with id : " + booksId + " is not exist!")
+        );
 
-        Page<Books> booksPage = booksRepository.findBooksWithDistanceWithPaging(usersPoint.getX(), usersPoint.getY(), searchingDistance, PageRequest.of(page, 10));
-        return getBooksPageResponseDto(usersPoint, booksPage);
-    }
-
-    private BooksPageResponseDto getBooksPageResponseDto(Point usersPoint, Page<Books> booksPage) {
-        int maxPages = booksPage.getTotalPages();
-        int curPages = booksPage.getNumber();
-
-        List<EachBooksPageResponseDto> booksList = booksPage.get()
-                .map(each -> new EachBooksPageResponseDto(each, usersPoint.getY(), usersPoint.getX()))
-                .collect(Collectors.toList());
-
-        return BooksPageResponseDto.builder()
-                .maxPage(maxPages)
-                .curPage(curPages)
-                .booksList(booksList)
-                .build();
+        return new BooksDetailResponseDto(target);
     }
 
     private Books findBooksInRepository(Long booksId) {

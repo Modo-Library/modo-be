@@ -1,16 +1,17 @@
 package modo.domain.dto.books;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import modo.domain.dto.pictures.PicturesResponseDto;
 import modo.domain.entity.Books;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
-@AllArgsConstructor
-@Builder
-public class BooksResponseDto {
+public class BooksDetailResponseDto {
     private Long booksId;
     private String name;
     private Long price;
@@ -22,9 +23,10 @@ public class BooksResponseDto {
     private String modifiedAt;
     private double latitude;
     private double longitude;
+    private List<PicturesResponseDto> picturesList = new ArrayList<>();
 
     @Builder
-    public BooksResponseDto(Books books) {
+    public BooksDetailResponseDto(Books books) {
         this.booksId = books.getBooksId();
         this.name = books.getName();
         this.price = books.getPrice();
@@ -42,5 +44,8 @@ public class BooksResponseDto {
         this.modifiedAt = books.getModifiedAt().toString();
         this.latitude = books.getLocation().getX();
         this.longitude = books.getLocation().getY();
+        this.picturesList = books.getPicturesList().stream()
+                .map(each -> new PicturesResponseDto(each))
+                .collect(Collectors.toList());
     }
 }
