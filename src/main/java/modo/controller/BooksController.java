@@ -42,4 +42,8 @@ public class BooksController extends BaseController {
         return sendResponse(booksService.findBooksList(token, startDistance, startId, searchingWord));
     }
 
+    @GetMapping("/api/v1/books/findBooks")
+    public ResponseEntity<?> findBooks(@RequestParam(value = "booksId") Long booksId) {
+        return sendResponse(booksService.findBooks(booksId));
+    }
 }

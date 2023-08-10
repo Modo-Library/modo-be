@@ -2,6 +2,7 @@ package modo.Books;
 
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.books.BooksDetailResponseDto;
 import modo.domain.dto.books.BooksSaveRequestDto;
 import modo.domain.dto.books.BooksUpdateRequestDto;
 import modo.domain.dto.books.EachBooksResponseDto;
@@ -106,7 +107,7 @@ public class BooksServiceTest {
         assertThat(targetBooks.getImgUrl()).isEqualTo(testImgUrl);
         assertThat(targetBooks.getCreatedAt()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(targetBooks.getModifiedAt()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(targetBooks.getDeadline()).isNull();
+        assertThat(targetBooks.getDeadline()).isBeforeOrEqualTo(LocalDateTime.now());
 
         assertThat(targetUsers.getBooksList().size()).isEqualTo(1);
         assertThat(targetUsers.getBooksList().get(0).getName()).isEqualTo(testName);
@@ -343,16 +344,19 @@ public class BooksServiceTest {
         assertThat(result.get(1).getName()).isEqualTo("아주대학교 정문에서 저장한 사용자의 책");
     }
 
-//    @Test
-//    void Service_책상세조회_테스트() {
-//        saveTestBooksAndPicturesList();
-//        Long booksId = booksRepository.findAll().get(0).getBooksId();
-//
-//        BooksResponseDto target = booksService.findBooks(booksId);
-//
-//        assertThat(target.getDescription()).isEqualTo(testDescription);
-//        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
-//    }
+    @Test
+    void Service_책상세조회_테스트() {
+        saveTestBooksAndPicturesList();
+        Long booksId = booksRepository.findAll().get(0).getBooksId();
+
+        BooksDetailResponseDto target = booksService.findBooks(booksId);
+
+        assertThat(target.getDescription()).isEqualTo(testDescription);
+        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
+        assertThat(target.getDeadline()).isEqualTo("");
+        assertThat(target.getPicturesList().size()).isEqualTo(2);
+        assertThat(target.getPicturesList().get(0).getImgUrl()).isEqualTo(testImgUrl + "1");
+    }
 
     private void saveTestBooksAndPicturesList() {
         PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()

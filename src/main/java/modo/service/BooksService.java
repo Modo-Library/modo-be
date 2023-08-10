@@ -3,10 +3,7 @@ package modo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
-import modo.domain.dto.books.BooksResponseDto;
-import modo.domain.dto.books.BooksSaveRequestDto;
-import modo.domain.dto.books.BooksUpdateRequestDto;
-import modo.domain.dto.books.EachBooksResponseDto;
+import modo.domain.dto.books.*;
 import modo.domain.dto.pictures.PicturesSaveRequestDto;
 import modo.domain.entity.Books;
 import modo.domain.entity.Users;
@@ -114,12 +111,12 @@ public class BooksService {
     }
 
     @Transactional(readOnly = true)
-    public BooksResponseDto findBooks(Long booksId) {
+    public BooksDetailResponseDto findBooks(Long booksId) {
         Books target = booksRepository.findBooks(booksId).orElseThrow(
                 () -> new IllegalArgumentException("Books with id : " + booksId + " is not exist!")
         );
-        //TODO Implementation
-        return new BooksResponseDto(target);
+
+        return new BooksDetailResponseDto(target);
     }
 
     private Books findBooksInRepository(Long booksId) {
