@@ -348,7 +348,7 @@ public class BooksRepositoryTest {
     // Test Books Information : static final variable
     static final String testName = "testName";
     static final Long testPrice = 1000L;
-    static final BooksStatus testStatus = BooksStatus.AVAILABLE;
+    static final BooksStatus testStatus = BooksStatus.AVAILABLE_RENT;
     static final LocalDateTime testDeadline = LocalDateTime.now().plusDays(7L);
     static final String testDescription = "testDescription";
     static final String testImgUrl = "testImgUrl";

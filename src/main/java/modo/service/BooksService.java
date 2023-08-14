@@ -119,6 +119,26 @@ public class BooksService {
         return new BooksDetailResponseDto(target);
     }
 
+    @Transactional
+    public void renting(Long booksId, String token) {
+        // TODO Implementation
+    }
+
+    @Transactional
+    public void returning(Long booksId, String token) {
+        // TODO Implementation
+    }
+
+    @Transactional
+    public void reserve(Long booksId, String token) {
+        // TODO Implementation
+    }
+
+    @Transactional
+    public void sell(Long booksId, String token) {
+        // TODO Implementation
+    }
+
     private Books findBooksInRepository(Long booksId) {
         return booksRepository.findById(booksId).orElseThrow(
                 () -> new IllegalArgumentException("Books with id : " + booksId + "is not exist!")
