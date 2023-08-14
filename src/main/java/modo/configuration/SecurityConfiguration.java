@@ -41,6 +41,12 @@ public class SecurityConfiguration {
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/profile").permitAll()
                                 .requestMatchers("/api/v1/**").authenticated()
+                                .requestMatchers("/websocket.html").permitAll()
+                                .requestMatchers("/modo-websocket/**").permitAll()
+                                .requestMatchers("/modo-websocket").permitAll()
+                                .requestMatchers("/app/**").permitAll()
+                                .requestMatchers("/app.js").permitAll()
+                                .requestMatchers("/main.css").permitAll()
                 )
                 .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new ExceptionHandlerFilter(), JwtAuthenticationFilter.class)
@@ -58,7 +64,13 @@ public class SecurityConfiguration {
                     .requestMatchers("/docs/**")
                     .requestMatchers("/favicon.ico")
                     .requestMatchers("/error")
-                    .requestMatchers("/profile");
+                    .requestMatchers("/profile")
+                    .requestMatchers("/websocket.html")
+                    .requestMatchers("/modo-websocket/**")
+                    .requestMatchers("/modo-websocket")
+                    .requestMatchers("/app/**")
+                    .requestMatchers("/app.js")
+                    .requestMatchers("/main.css");
         };
     }
 

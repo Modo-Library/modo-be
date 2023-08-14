@@ -83,6 +83,8 @@ dependencies {
     implementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.103'
     testImplementation group: 'software.amazon.awssdk', name: 's3', version: '2.20.103'
 
+    // WebSocket
+    implementation group: 'org.springframework.boot', name: 'spring-boot-starter-websocket', version: '3.1.2'
 }
 
 ext {
