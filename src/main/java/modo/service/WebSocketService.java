@@ -13,6 +13,7 @@ import modo.repository.ChatRoomsRepository;
 import modo.repository.UsersRepository;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -28,9 +29,10 @@ public class WebSocketService {
 
     private final UsersRepository usersRepository;
 
+    @Transactional
     public void sendMessages(ChatSendingMessages messages) {
         // 보내려는 메세지가 새로운 채팅방이라면 새로운 채팅방 생성
-        if (chatRoomsRepository.existsById(messages.getId()))
+        if (!chatRoomsRepository.existsById(messages.getId()))
             saveChatRooms(messages);
 
         // 보내려는 메세지의 채팅방 조회
@@ -50,6 +52,7 @@ public class WebSocketService {
         simpMessagingTemplate.convertAndSend("/topic/greetings", messages);
     }
 
+    @Transactional
     public void saveChatRooms(ChatSendingMessages messages) {
         Users sender = usersRepository.findById(messages.getSender())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find sender : " + messages.getSender()));

@@ -27,6 +27,7 @@ public class ChatRooms {
     @JoinColumn(name = "USERS_CHATROOMS")
     private List<Users> usersList = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chatRooms")
     private List<ChatMessages> chatMessagesList = new ArrayList<>();
 
