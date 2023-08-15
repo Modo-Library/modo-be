@@ -23,7 +23,8 @@ public class ChatRooms {
     @Column(nullable = false)
     private LocalDateTime timeStamp;
 
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "chatRoomsList")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "USERS_CHATROOMS")
     private List<Users> usersList = new ArrayList<>();
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "chatRooms")

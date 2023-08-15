@@ -63,7 +63,8 @@ public class Users implements UserDetails {
     private List<Likes> likesList = new ArrayList<>();
 
     @Builder.Default
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "usersList")
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinColumn(name = "CHATROOMS_USERS")
     private List<ChatRooms> chatRoomsList = new ArrayList<>();
 
     public void setUsersHistory(UsersHistory usersHistory) {
