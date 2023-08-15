@@ -62,6 +62,10 @@ public class Users implements UserDetails {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "users", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<Likes> likesList = new ArrayList<>();
 
+    @Builder.Default
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "usersList")
+    private List<ChatRooms> chatRoomsList = new ArrayList<>();
+
     public void setUsersHistory(UsersHistory usersHistory) {
         this.usersHistory = usersHistory;
     }
@@ -97,6 +101,11 @@ public class Users implements UserDetails {
     public void removeBooks(Books books) {
         this.booksList.remove(books);
     }
+
+    public void addChatRooms(ChatRooms chatRooms) {
+        this.getChatRoomsList().add(chatRooms);
+    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
