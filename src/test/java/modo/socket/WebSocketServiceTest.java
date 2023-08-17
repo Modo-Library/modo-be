@@ -86,7 +86,6 @@ public class WebSocketServiceTest {
 
     @Test
     void Service_이미있는채팅방_웹소켓메세지수신_테스트() {
-
         //given
         Long booksId = booksRepository.findAll().get(0).getBooksId();
         ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString());

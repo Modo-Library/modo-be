@@ -12,7 +12,11 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
+        // Listener's Endpoint (Server -> Client)
+        // Endpoint : /topic/{ $usersId }
         config.enableSimpleBroker("/topic");
+        // Publisher's Endpoint (Client -> Server)
+        // Endpoint : /app/{ $MessageMappingValue }
         config.setApplicationDestinationPrefixes("/app");
     }
 
