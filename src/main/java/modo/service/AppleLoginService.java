@@ -1,8 +1,6 @@
 package modo.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWK;
@@ -14,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.users.Users.UsersLoginResponseDto;
 import modo.domain.dto.users.Users.UsersSaveRequestDto;
-import modo.domain.entity.Users;
 import org.bouncycastle.asn1.pkcs.PrivateKeyInfo;
 import org.bouncycastle.openssl.PEMParser;
 import org.bouncycastle.openssl.jcajce.JcaPEMKeyConverter;
@@ -30,7 +27,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.io.*;
 import java.security.PrivateKey;
 import java.security.interfaces.RSAPublicKey;
-import java.text.ParseException;
 import java.util.*;
 
 @RequiredArgsConstructor
@@ -104,8 +100,7 @@ public class AppleLoginService {
                 .queryParam("grant_type", "authorization_code")
                 .queryParam("client_id", clientId)
                 .queryParam("client_secret", clientSecretKey)
-//               TODO(appleLogin.getCode() Front-end와 상의해서 맞추기)
-//              .queryParam("code", appleLogin.getCode())
+                .queryParam("code", code)
                 .build(false);
 
         ResponseEntity<Map> response = restTemplate.exchange(uri.toUriString(), HttpMethod.POST, entity, Map.class);
