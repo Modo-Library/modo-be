@@ -1,10 +1,7 @@
 package modo.users;
 
 import modo.domain.entity.Users;
-import modo.repository.BooksRepository;
-import modo.repository.PicturesRepository;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
+import modo.repository.*;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,9 +30,17 @@ public class UsersRepositoryTest {
     @Autowired
     PicturesRepository picturesRepository;
 
+    @Autowired
+    private ChatRoomsRepository chatRoomsRepository;
+
+    @Autowired
+    private ChatMessagesRepository chatMessagesRepository;
+
 
     @BeforeEach
     void tearDown() {
+        chatMessagesRepository.deleteAllInBatch();
+        chatRoomsRepository.deleteAllInBatch();
         picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();

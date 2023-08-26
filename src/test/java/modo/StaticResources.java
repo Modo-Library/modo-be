@@ -9,12 +9,12 @@ import java.util.List;
 
 public class StaticResources {
 
-    public static String senderId = "senderId";
+    public static final String senderId = "senderId";
     public static final String senderNickname = "senderNickname";
     public static final double senderLatitude = 1.1;
     public static final double senderLongitude = 1.1;
 
-    public static final String receiverId = "senderId";
+    public static final String receiverId = "receiverId";
     public static final String receiverNickname = "senderNickname";
     public static final double receiverLatitude = 1.1;
     public static final double receiverLongitude = 1.1;
@@ -61,5 +61,7 @@ public class StaticResources {
             .usersId(receiverId)
             .picturesSaveRequestDtoList(picturesSaveRequestDtoList)
             .build();
+
+    public static final String testMessages = "testMessages";
 
 }

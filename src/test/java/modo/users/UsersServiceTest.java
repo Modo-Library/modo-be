@@ -47,6 +47,13 @@ public class UsersServiceTest {
     @Autowired
     PicturesRepository picturesRepository;
 
+    @Autowired
+    private ChatRoomsRepository chatRoomsRepository;
+
+    @Autowired
+    private ChatMessagesRepository chatMessagesRepository;
+
+
     @Mock
     private JwtTokenProvider jwtTokenProvider;
 
@@ -54,6 +61,8 @@ public class UsersServiceTest {
 
     @BeforeEach
     void tearDown() {
+        chatMessagesRepository.deleteAllInBatch();
+        chatRoomsRepository.deleteAllInBatch();
         picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();

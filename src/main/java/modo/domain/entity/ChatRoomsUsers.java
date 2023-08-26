@@ -3,32 +3,26 @@ package modo.domain.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDateTime;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @Entity
-public class ChatMessages {
+public class ChatRoomsUsers {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long chatMessagesId;
+    private Long ChatRoomsUsersId;
 
     @Column(nullable = false)
-    private String sender;
+    private Long chatRoomsId;
 
     @Column(nullable = false)
-    private String receiver;
+    private Long booksId;
 
     @Column(nullable = false)
-    private String content;
+    private String senderId;
 
     @Column(nullable = false)
-    private LocalDateTime timeStamp;
-
-    @ManyToOne
-    @JoinColumn(name = "chatRoomsId")
-    private ChatRooms chatRooms;
+    private String receiverId;
 }

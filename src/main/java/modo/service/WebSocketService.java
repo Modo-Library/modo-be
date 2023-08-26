@@ -3,10 +3,9 @@ package modo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.domain.dto.chat.ChatSendingMessages;
-import modo.domain.entity.Books;
 import modo.domain.entity.ChatMessages;
 import modo.domain.entity.ChatRooms;
-import modo.domain.entity.Users;
+import modo.exception.chatException.ChatRoomsNotExistException;
 import modo.repository.BooksRepository;
 import modo.repository.ChatMessagesRepository;
 import modo.repository.ChatRoomsRepository;
@@ -15,7 +14,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Log4j2
@@ -28,52 +26,35 @@ public class WebSocketService {
     private final BooksRepository booksRepository;
 
     private final UsersRepository usersRepository;
+    private final ChatService chatService;
+
+    public void sendMessages(ChatSendingMessages messages) {
+        // 보내려는 메세지가 속한 채팅방 조회, 채팅방이 없다면 새롭게 생성
+        ChatRooms chatRooms;
+        try {
+            chatRooms = chatService.findChatRooms(messages);
+        } catch (ChatRoomsNotExistException e) {
+            chatRooms = chatService.saveChatRooms(messages);
+        }
+        // 메세지 저장
+        saveMessages(messages, chatRooms);
+        // 채팅방 내부 사용자 아이디 조회
+        List<String> usersIdList = chatRoomsRepository.findUsersIdListByChatRoomsId(chatRooms.getChatRoomsId());
+        // 소켓으로 메세지 전송
+        usersIdList.stream()
+                .forEach((String each) -> {
+                    simpMessagingTemplate.convertAndSend("/topic/" + each, messages);
+                });
+    }
 
     @Transactional
-    public void sendMessages(ChatSendingMessages messages) {
-        // 보내려는 메세지가 새로운 채팅방이라면 새로운 채팅방 생성
-        if (!chatRoomsRepository.existsById(messages.getId()))
-            saveChatRooms(messages);
-
-        // 보내려는 메세지의 채팅방 조회
-        ChatRooms chatRooms = chatRoomsRepository.findById(messages.getId())
-                .orElseThrow(() -> new IllegalArgumentException("ChatRooms with id : " + messages.getId() + "is not exist!"));
-
-        // 새로운 채팅 메세지 생성 및 저장
+    public void saveMessages(ChatSendingMessages messages, ChatRooms chatRooms) {
+        // 새로운 채팅 메세지 생성
         ChatMessages chatMessages = messages.toEntity();
         chatMessages.setChatRooms(chatRooms);
         chatRooms.addChatMessages(chatMessages);
+
+        // 메세지 저장
         chatMessagesRepository.save(chatMessages);
-
-        // 채팅방 timeStamp 최신화
-        chatRooms.setTimeStampToNow();
-
-        // 소켓으로 메세지 전송
-        simpMessagingTemplate.convertAndSend("/topic/greetings", messages);
     }
-
-    @Transactional
-    public void saveChatRooms(ChatSendingMessages messages) {
-        Users sender = usersRepository.findById(messages.getSender())
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find sender : " + messages.getSender()));
-
-        Users receiver = usersRepository.findById(messages.getReceiver())
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find receiver : " + messages.getReceiver()));
-
-        Books books = booksRepository.findById(messages.getId())
-                .orElseThrow(() -> new IllegalArgumentException("Cannot find books : " + messages.getId()));
-
-        ChatRooms chatRooms = ChatRooms.builder()
-                .chatRoomsId(messages.getId())
-                .imgUrl(books.getImgUrl())
-                .timeStamp(LocalDateTime.parse(messages.getTimeStamp()))
-                .usersList(List.of(sender, receiver))
-                .build();
-
-        sender.addChatRooms(chatRooms);
-        receiver.addChatRooms(chatRooms);
-
-        chatRoomsRepository.save(chatRooms);
-    }
-
 }
