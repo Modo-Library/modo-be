@@ -105,6 +105,12 @@ public class AppleLoginService {
                 .build(false);
 
         ResponseEntity<Map> response = restTemplate.exchange(uri.toUriString(), HttpMethod.POST, entity, Map.class);
+
+        response.getBody().entrySet().stream()
+                .forEach(each -> {
+                    log.info(each);
+                });
+
         String idToken = response.getBody().get("idToken").toString();
         log.info("Success to get idToken with apple server with code value");
         log.info("IdToken : {}", idToken);
