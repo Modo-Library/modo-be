@@ -111,7 +111,7 @@ public class AppleLoginService {
                     log.info(each);
                 });
 
-        String idToken = response.getBody().get("idToken").toString();
+        String idToken = response.getBody().get("id_token").toString();
         log.info("Success to get idToken with apple server with code value");
         log.info("IdToken : {}", idToken);
 
