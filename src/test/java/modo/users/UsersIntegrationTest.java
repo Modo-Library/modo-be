@@ -73,6 +73,12 @@ public class UsersIntegrationTest {
     @Autowired
     private PicturesRepository picturesRepository;
 
+    @Autowired
+    private ChatRoomsRepository chatRoomsRepository;
+
+    @Autowired
+    private ChatMessagesRepository chatMessagesRepository;
+
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -89,6 +95,8 @@ public class UsersIntegrationTest {
 
     @BeforeEach
     void tearDown() {
+        chatMessagesRepository.deleteAllInBatch();
+        chatRoomsRepository.deleteAllInBatch();
         picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersReviewRepository.deleteAllInBatch();

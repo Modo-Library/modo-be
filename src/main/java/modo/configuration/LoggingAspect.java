@@ -17,9 +17,9 @@ import java.util.Arrays;
 @Component
 @Aspect
 public class LoggingAspect {
-    @Pointcut("execution(* modo.service..*(..))")
-    private void serviceTarget() {
-    }
+//    @Pointcut("execution(* modo.service..*(..))")
+//    private void serviceTarget() {
+//    }
 
     @Pointcut("execution(* modo.repository..*(..))")
     private void repositoryTarget() {
@@ -49,18 +49,18 @@ public class LoggingAspect {
         }
     }
 
-    @Around("serviceTarget()")
-    public Object serviceExecution(ProceedingJoinPoint joinPoint) throws Throwable {
-        long start = System.currentTimeMillis();
-        try {
-            return joinPoint.proceed();
-        } finally {
-            long finish = System.currentTimeMillis();
-            Signature signature = joinPoint.getSignature();
-            String className = joinPoint.getTarget().getClass().getSimpleName();
-            log.debug("{}.{}({}) : {}ms", className, signature.getName(), Arrays.toString(joinPoint.getArgs()), (finish - start));
-        }
-    }
+//    @Around("serviceTarget()")
+//    public Object serviceExecution(ProceedingJoinPoint joinPoint) throws Throwable {
+//        long start = System.currentTimeMillis();
+//        try {
+//            return joinPoint.proceed();
+//        } finally {
+//            long finish = System.currentTimeMillis();
+//            Signature signature = joinPoint.getSignature();
+//            String className = joinPoint.getTarget().getClass().getSimpleName();
+//            log.debug("{}.{}({}) : {}ms", className, signature.getName(), Arrays.toString(joinPoint.getArgs()), (finish - start));
+//        }
+//    }
 
     @Around("repositoryTarget()")
     public Object dataAccessExecution(ProceedingJoinPoint joinPoint) throws Throwable {

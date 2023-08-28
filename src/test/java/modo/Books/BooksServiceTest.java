@@ -359,6 +359,7 @@ public class BooksServiceTest {
         assertThat(target.getPicturesList().get(0).getImgUrl()).isEqualTo(testImgUrl + "1");
     }
 
+
     private void saveTestBooksAndPicturesList() {
         PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
                 .imgUrl(testImgUrl + "1")
@@ -389,7 +390,7 @@ public class BooksServiceTest {
     static final String testName = "스프링으로 하는 마이크로서비스 구축";
     static final String anotherTestName = "Real MySQL 8.0";
     static final Long testPrice = 40000L;
-    static final BooksStatus testStatus = BooksStatus.AVAILABLE;
+    static final BooksStatus testStatus = BooksStatus.AVAILABLE_RENT;
     static final String testDescription = "완전 새 책";
     static final String testImgUrl = "s3://testImgUrl.com";
     static final String testFilename = "testFilename.jpg";

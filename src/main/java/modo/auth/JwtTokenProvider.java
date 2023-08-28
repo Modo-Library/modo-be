@@ -93,6 +93,7 @@ public class JwtTokenProvider {
         if (token != null) {
             return token;
         }
+        log.info(request.getRequestURL());
         throw new TokenIsNullException();
     }
 
