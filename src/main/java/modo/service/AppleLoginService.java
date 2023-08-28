@@ -55,7 +55,8 @@ public class AppleLoginService {
     public UsersLoginResponseDto loginOrRegister(String code) throws Exception {
 
         log.info("Try to get information in appleKeyId");
-        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyPath);
+//        InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(keyPath);
+        InputStream inputStream = new FileInputStream(keyPath);
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         String readLine = null;
         StringBuilder stringBuilder = new StringBuilder();
