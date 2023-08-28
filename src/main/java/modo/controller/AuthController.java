@@ -5,7 +5,10 @@ import modo.auth.JwtTokenProvider;
 import modo.service.AppleLoginService;
 import modo.service.KakaoLoginService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,7 +18,7 @@ public class AuthController extends BaseController {
     private final KakaoLoginService kakaoLoginService;
     private final AppleLoginService appleLoginService;
 
-    @GetMapping("/oauth/kakao")
+    @PostMapping("/oauth/kakao")
     public ResponseEntity<?> kakaoLogin(@RequestParam("code") String code) throws Exception {
         return sendResponse(kakaoLoginService.loginOrRegister(code));
     }
