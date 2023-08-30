@@ -106,6 +106,9 @@ public class JwtTokenProvider {
     }
 
     private boolean checkRefreshTokenIsExpired(String token) {
+        String usersId = getUsersId(token);
+        if (redisTokenService.findRefreshToken(usersId) == null) return true;
+
         Jws<Claims> claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
         return claims.getBody().getExpiration().before(new Date());
     }
@@ -120,6 +123,7 @@ public class JwtTokenProvider {
 
         // Request Reissue before AccessToken Expired
         if (!checkAccessTokenIsExpired(refreshToken)) {
+            log.info("***Request Reissue before AccessToken Expired***");
             expireAllToken(usersId);
             throw new ReIssueBeforeAccessTokenExpiredException("Access Token is still valid! Can't reIssue accessToken!");
         }
