@@ -158,6 +158,9 @@ public class AuthIntegrationTest {
 
     @Test
     void Access토큰만료전_reIssue요청시도_테스트() throws Exception {
+        // Set Access Token valid time to 1s
+        jwtTokenProvider.setAccessTokenValidTime(1L);
+
         // Create new testUser and new access, refresh token
         saveNewTestUsersAndCreateNewToken();
 
@@ -183,6 +186,14 @@ public class AuthIntegrationTest {
         JSONObject resultBody = new JSONObject(testResult.getResponse().getContentAsString());
         assertThat(resultBody.get("name")).isEqualTo(ErrorCode.ReIssueBeforeAccessTokenExpiredException.name());
 
+        Thread.sleep(1000);
+
+        mockMvc.perform(post("/api/v1/auth/reIssue")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", refreshToken)
+                )
+                .andExpect(status().isBadRequest())
+                .andDo(print());
     }
 
     @Test
