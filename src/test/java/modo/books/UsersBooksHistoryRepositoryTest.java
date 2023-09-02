@@ -1,13 +1,10 @@
-package modo.Pictures;
+package modo.books;
 
 import modo.domain.entity.Books;
-import modo.domain.entity.Pictures;
 import modo.domain.entity.Users;
+import modo.domain.entity.UsersBooksHistory;
 import modo.enums.BooksStatus;
-import modo.repository.BooksRepository;
-import modo.repository.PicturesRepository;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
+import modo.repository.*;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,43 +21,53 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class PicturesRepositoryTest {
+public class UsersBooksHistoryRepositoryTest {
 
     @Autowired
-    PicturesRepository picturesRepository;
-
-    @Autowired
-    BooksRepository booksRepository;
+    UsersBooksHistoryRepository usersBooksHistoryRepository;
 
     @Autowired
     UsersRepository usersRepository;
 
     @Autowired
+    BooksRepository booksRepository;
+
+    @Autowired
+    UsersReviewRepository usersReviewRepository;
+
+    @Autowired
     UsersHistoryRepository usersHistoryRepository;
 
-    Books testBooks;
+    @Autowired
+    PicturesRepository picturesRepository;
 
     @BeforeEach
     void tearDown() {
-        usersHistoryRepository.deleteAllInBatch();
         picturesRepository.deleteAllInBatch();
+        usersReviewRepository.deleteAllInBatch();
+        usersHistoryRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
+        usersBooksHistoryRepository.deleteAllInBatch();
     }
 
     @Test
-    void Repository_사진저장_테스트() {
-        Pictures pictures = Pictures.builder()
-                .filename(testFilename)
-                .imgUrl(testImgUrl)
+    void Repository_기록저장_테스트() {
+        Users testUsers = saveTestUsers();
+        Books testBooks = saveTestBooks();
+        UsersBooksHistory usersBooksHistory = UsersBooksHistory.builder()
+                .status(testStatus)
+                .books(testBooks)
+                .users(testUsers)
                 .build();
 
-        picturesRepository.save(pictures);
+        usersBooksHistoryRepository.save(usersBooksHistory);
+        UsersBooksHistory target = usersBooksHistoryRepository.findAll().get(0);
 
-        Pictures target = picturesRepository.findAll().get(0);
+        assertThat(target.getStatus()).isEqualTo(testStatus);
+        assertThat(target.getUsers().getUsersId()).isEqualTo(testUsersId);
+        assertThat(target.getBooks().getName()).isEqualTo(testName);
 
-        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
-        assertThat(target.getFilename()).isEqualTo(testFilename);
     }
 
     // Test Users Information : static final variable
@@ -81,11 +88,7 @@ public class PicturesRepositoryTest {
     static final String testDescription = "testDescription";
     static final String testImgUrl = "testImgUrl";
 
-    // Test Pictures Information : static final variable
-    static final String testFilename = "testFilename";
-
-
-    private void saveTestUsers() {
+    private Users saveTestUsers() {
         Users users = Users.builder()
                 .usersId(testUsersId)
                 .nickname(testNickname)
@@ -94,10 +97,10 @@ public class PicturesRepositoryTest {
                 .reviewCount(testReviewCount)
                 .build();
 
-        usersRepository.save(users);
+        return usersRepository.save(users);
     }
 
-    private void saveTestBooks() {
+    private Books saveTestBooks() {
         Books books = Books.builder()
                 .name(testName)
                 .price(testPrice)
@@ -106,6 +109,6 @@ public class PicturesRepositoryTest {
                 .imgUrl(testImgUrl)
                 .build();
 
-        testBooks = booksRepository.save(books);
+        return booksRepository.save(books);
     }
 }

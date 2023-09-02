@@ -1,11 +1,12 @@
-package modo.Books;
+package modo.pictures;
 
 import modo.domain.entity.Books;
-import modo.domain.entity.Likes;
+import modo.domain.entity.Pictures;
 import modo.domain.entity.Users;
 import modo.enums.BooksStatus;
 import modo.repository.BooksRepository;
-import modo.repository.LikesRepository;
+import modo.repository.PicturesRepository;
+import modo.repository.UsersHistoryRepository;
 import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,39 +24,43 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class LikesRepositoryTest {
+public class PicturesRepositoryTest {
+
     @Autowired
-    LikesRepository likesRepository;
+    PicturesRepository picturesRepository;
+
+    @Autowired
+    BooksRepository booksRepository;
 
     @Autowired
     UsersRepository usersRepository;
 
     @Autowired
-    BooksRepository booksRepository;
+    UsersHistoryRepository usersHistoryRepository;
+
+    Books testBooks;
 
     @BeforeEach
     void tearDown() {
-        likesRepository.deleteAllInBatch();
+        usersHistoryRepository.deleteAllInBatch();
+        picturesRepository.deleteAllInBatch();
+        booksRepository.deleteAllInBatch();
+        usersRepository.deleteAllInBatch();
     }
 
     @Test
-    void Repository_좋아요저장_테스트() {
-        Users testUsers = saveTestUsers();
-        Books testBooks = saveTestBooks();
-        Likes likes = Likes.builder()
-                .users(testUsers)
-                .books(testBooks)
+    void Repository_사진저장_테스트() {
+        Pictures pictures = Pictures.builder()
+                .filename(testFilename)
+                .imgUrl(testImgUrl)
                 .build();
 
-        testUsers.getLikesList().add(likes);
-        testBooks.getLikesList().add(likes);
+        picturesRepository.save(pictures);
 
-        likesRepository.save(likes);
+        Pictures target = picturesRepository.findAll().get(0);
 
-        Likes target = likesRepository.findAll().get(0);
-
-        assertThat(target.getBooks()).isEqualTo(testBooks);
-        assertThat(target.getUsers()).isEqualTo(testUsers);
+        assertThat(target.getImgUrl()).isEqualTo(testImgUrl);
+        assertThat(target.getFilename()).isEqualTo(testFilename);
     }
 
     // Test Users Information : static final variable
@@ -76,7 +81,11 @@ public class LikesRepositoryTest {
     static final String testDescription = "testDescription";
     static final String testImgUrl = "testImgUrl";
 
-    private Users saveTestUsers() {
+    // Test Pictures Information : static final variable
+    static final String testFilename = "testFilename";
+
+
+    private void saveTestUsers() {
         Users users = Users.builder()
                 .usersId(testUsersId)
                 .nickname(testNickname)
@@ -85,10 +94,10 @@ public class LikesRepositoryTest {
                 .reviewCount(testReviewCount)
                 .build();
 
-        return usersRepository.save(users);
+        usersRepository.save(users);
     }
 
-    private Books saveTestBooks() {
+    private void saveTestBooks() {
         Books books = Books.builder()
                 .name(testName)
                 .price(testPrice)
@@ -97,6 +106,6 @@ public class LikesRepositoryTest {
                 .imgUrl(testImgUrl)
                 .build();
 
-        return booksRepository.save(books);
+        testBooks = booksRepository.save(books);
     }
 }

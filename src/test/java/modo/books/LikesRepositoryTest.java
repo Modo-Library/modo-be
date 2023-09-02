@@ -1,10 +1,12 @@
-package modo.Books;
+package modo.books;
 
 import modo.domain.entity.Books;
+import modo.domain.entity.Likes;
 import modo.domain.entity.Users;
-import modo.domain.entity.UsersBooksHistory;
 import modo.enums.BooksStatus;
-import modo.repository.*;
+import modo.repository.BooksRepository;
+import modo.repository.LikesRepository;
+import modo.repository.UsersRepository;
 import modo.util.GeomUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,10 +23,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class UsersBooksHistoryRepositoryTest {
-
+public class LikesRepositoryTest {
     @Autowired
-    UsersBooksHistoryRepository usersBooksHistoryRepository;
+    LikesRepository likesRepository;
 
     @Autowired
     UsersRepository usersRepository;
@@ -32,42 +33,29 @@ public class UsersBooksHistoryRepositoryTest {
     @Autowired
     BooksRepository booksRepository;
 
-    @Autowired
-    UsersReviewRepository usersReviewRepository;
-
-    @Autowired
-    UsersHistoryRepository usersHistoryRepository;
-
-    @Autowired
-    PicturesRepository picturesRepository;
-
     @BeforeEach
     void tearDown() {
-        picturesRepository.deleteAllInBatch();
-        usersReviewRepository.deleteAllInBatch();
-        usersHistoryRepository.deleteAllInBatch();
-        booksRepository.deleteAllInBatch();
-        usersRepository.deleteAllInBatch();
-        usersBooksHistoryRepository.deleteAllInBatch();
+        likesRepository.deleteAllInBatch();
     }
 
     @Test
-    void Repository_기록저장_테스트() {
+    void Repository_좋아요저장_테스트() {
         Users testUsers = saveTestUsers();
         Books testBooks = saveTestBooks();
-        UsersBooksHistory usersBooksHistory = UsersBooksHistory.builder()
-                .status(testStatus)
-                .books(testBooks)
+        Likes likes = Likes.builder()
                 .users(testUsers)
+                .books(testBooks)
                 .build();
 
-        usersBooksHistoryRepository.save(usersBooksHistory);
-        UsersBooksHistory target = usersBooksHistoryRepository.findAll().get(0);
+        testUsers.getLikesList().add(likes);
+        testBooks.getLikesList().add(likes);
 
-        assertThat(target.getStatus()).isEqualTo(testStatus);
-        assertThat(target.getUsers().getUsersId()).isEqualTo(testUsersId);
-        assertThat(target.getBooks().getName()).isEqualTo(testName);
+        likesRepository.save(likes);
 
+        Likes target = likesRepository.findAll().get(0);
+
+        assertThat(target.getBooks()).isEqualTo(testBooks);
+        assertThat(target.getUsers()).isEqualTo(testUsers);
     }
 
     // Test Users Information : static final variable

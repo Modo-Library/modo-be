@@ -1,4 +1,4 @@
-package modo.Books;
+package modo.books;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.log4j.Log4j2;
