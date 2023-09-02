@@ -41,6 +41,13 @@ operation::Users-changeLocation[snippets='http-request,request-headers,path-para
 [[Users-logout]]
 == Users-logout
 
-* AccessToken을 header로 담아서 요청만 보내주시면 되고, responseBody는 비어있는 채로 200번 응답이 온다면 성공적으로 logout이 완료된 것 입니다##.##
+* AccessToken을 header로 담아서 요청만 보내주시면 되고, responseBody는 비어있는 채로 200번 응답이 온다면 성공적으로 logout이 완료된 것 입니다.
 
 operation::Users-logout[snippets='http-request,request-headers,http-response']
+
+[[Users-delete]]
+== Users-delete
+
+* logout과 마찬가지로 responseBody가 비어있는 채로 200번 응답이 온다면 성공적으로 delete(회원탈퇴)가 완료된 것 입니다.
+
+operation::Users-delete[snippets='http-request,request-headers,http-response']

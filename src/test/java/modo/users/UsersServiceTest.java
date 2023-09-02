@@ -25,6 +25,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -48,10 +50,16 @@ public class UsersServiceTest {
     PicturesRepository picturesRepository;
 
     @Autowired
-    private ChatRoomsRepository chatRoomsRepository;
+    ChatRoomsRepository chatRoomsRepository;
 
     @Autowired
-    private ChatMessagesRepository chatMessagesRepository;
+    ChatMessagesRepository chatMessagesRepository;
+
+    @Autowired
+    LikesRepository likesRepository;
+
+    @Autowired
+    UsersBooksHistoryRepository usersBooksHistoryRepository;
 
 
     @Mock
@@ -71,7 +79,7 @@ public class UsersServiceTest {
 
     @BeforeEach
     void injectRepositoryToUsersService() {
-        usersService = new UsersService(usersRepository, usersHistoryRepository, usersReviewRepository, jwtTokenProvider);
+        usersService = new UsersService(usersRepository, usersHistoryRepository, usersReviewRepository, jwtTokenProvider, chatRoomsRepository, likesRepository, usersBooksHistoryRepository, booksRepository);
     }
 
     @Test
@@ -530,6 +538,19 @@ public class UsersServiceTest {
 
         // Then
         assertThat(result).isEqualTo(testUsersId);
+    }
+
+    @Test
+    void Service_회원탈퇴_테스트() {
+        UsersResponseDto resultResponseDto = usersService.save(testUsersSaveRequestDto);
+
+        when(jwtTokenProvider.getUsersId(any())).thenReturn(testUsersId);
+
+        usersService.delete("DummyTokenValue");
+
+        assertThat(usersRepository.findAll().size()).isEqualTo(0);
+        assertThat(usersReviewRepository.findAll().size()).isEqualTo(0);
+        assertThat(usersHistoryRepository.findAll().size()).isEqualTo(0);
     }
 
     static final String testUsersId = "testUsersId";

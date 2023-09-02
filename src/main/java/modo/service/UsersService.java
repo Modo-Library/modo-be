@@ -12,9 +12,7 @@ import modo.domain.dto.users.UsersReview.UsersReviewSaveRequestDto;
 import modo.domain.entity.Users;
 import modo.domain.entity.UsersHistory;
 import modo.domain.entity.UsersReview;
-import modo.repository.UsersHistoryRepository;
-import modo.repository.UsersRepository;
-import modo.repository.UsersReviewRepository;
+import modo.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +25,10 @@ public class UsersService {
     private final UsersHistoryRepository usersHistoryRepository;
     private final UsersReviewRepository usersReviewRepository;
     private final JwtTokenProvider jwtTokenProvider;
+    private final ChatRoomsRepository chatRoomsRepository;
+    private final LikesRepository likesRepository;
+    private final UsersBooksHistoryRepository usersBooksHistoryRepository;
+    private final BooksRepository booksRepository;
 
     @Transactional
     public UsersResponseDto save(UsersSaveRequestDto usersSaveRequestDto) {
@@ -158,6 +160,35 @@ public class UsersService {
     public void logout(String accessToken) {
         String usersId = jwtTokenProvider.getUsersId(accessToken);
         jwtTokenProvider.expireAllToken(usersId);
+    }
+
+    @Transactional
+    public void delete(String token) {
+        logout(token);
+        String usersId = jwtTokenProvider.getUsersId(token);
+        Users users = findUsersInRepository(usersId);
+        usersRepository.delete(users);
+//        users.getChatRoomsList().stream()
+//                .forEach(each -> {
+//                    chatRoomsRepository.delete(each);
+//                });
+//        users.getBooksList().stream()
+//                .forEach((each -> {
+//                    booksRepository.delete(each);
+//                }));
+//        users.getUsersBooksHistoryList().stream()
+//                .forEach((each -> {
+//                    usersBooksHistoryRepository.delete(each);
+//                }));
+//        users.getLikesList().stream()
+//                .forEach((each -> {
+//                    likesRepository.delete(each);
+//                }));
+//        users.getUsersReviewList().stream()
+//                .forEach((each -> {
+//                    usersReviewRepository.delete(each);
+//                }));
+//        usersHistoryRepository.delete(users.getUsersHistory());
     }
 
     private Users findUsersInRepository(String usersId) {

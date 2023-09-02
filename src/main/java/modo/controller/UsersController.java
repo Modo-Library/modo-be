@@ -59,4 +59,10 @@ public class UsersController extends BaseController {
         return sendResponse();
     }
 
+    @DeleteMapping("api/v1/users/delete")
+    public ResponseEntity<?> delete(@RequestHeader(value = "token") String token) {
+        usersService.delete(token);
+        return sendResponse();
+    }
+
 }

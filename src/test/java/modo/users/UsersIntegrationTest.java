@@ -439,6 +439,34 @@ public class UsersIntegrationTest {
         assertThat(refreshTokenRepository.findById(testUsersId)).isEmpty();
     }
 
+    @Test
+    void Integration_회원탈퇴_테스트() throws Exception {
+        // Save Users First
+        mockMvc.perform(post("/api/v2/users/save")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(testUsersSaveRequestDto))
+                )
+                .andExpect(status().isOk());
+
+        accessToken = jwtTokenProvider.createAccessToken(testUsersId);
+
+        mockMvc.perform(delete("/api/v1/users/delete")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Users-delete",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Access Token value")
+                        )))
+                .andDo(print());
+
+        assertThat(usersRepository.findById(testUsersId)).isEmpty();
+        assertThat(usersHistoryRepository.findById(testUsersId)).isEmpty();
+    }
+
 
     static final String testUsersId = "testUsersId";
     static final String testNickname = "testNickname";

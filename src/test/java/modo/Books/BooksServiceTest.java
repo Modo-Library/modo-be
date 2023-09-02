@@ -360,7 +360,7 @@ public class BooksServiceTest {
     }
 
 
-    private void saveTestBooksAndPicturesList() {
+    void saveTestBooksAndPicturesList() {
         PicturesSaveRequestDto requestDto1 = PicturesSaveRequestDto.builder()
                 .imgUrl(testImgUrl + "1")
                 .filename(testFilename + "1")
