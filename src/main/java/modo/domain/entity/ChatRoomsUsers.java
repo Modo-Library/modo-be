@@ -9,11 +9,11 @@ import lombok.*;
 @Getter
 @Setter
 @Entity
+@Table(indexes = {
+        @Index(name = "idx_users", columnList = "senderId, receiverId")
+})
 public class ChatRoomsUsers {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ChatRoomsUsersId;
-
     @Column(nullable = false)
     private Long chatRoomsId;
 

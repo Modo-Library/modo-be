@@ -21,5 +21,11 @@ public interface ChatRoomsUsersRepository extends JpaRepository<ChatRoomsUsers, 
 
     @Query("SELECT cr FROM ChatRooms cr WHERE cr.chatRoomsId IN " +
             "(SELECT cru.chatRoomsId FROM ChatRoomsUsers cru WHERE cru.senderId = :usersId OR cru.receiverId = :usersId)")
+    List<ChatRooms> findChatRoomsByUsersId1(@Param("usersId") String usersId);
+
+    @Query("SELECT DISTINCT cr " +
+            "FROM ChatRooms cr " +
+            "INNER JOIN ChatRoomsUsers cru ON cr.chatRoomsId = cru.chatRoomsId " +
+            "WHERE cru.senderId = :usersId OR cru.receiverId = :usersId")
     List<ChatRooms> findChatRoomsByUsersId(@Param("usersId") String usersId);
 }
