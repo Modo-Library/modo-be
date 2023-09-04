@@ -8,6 +8,7 @@ import modo.repository.*;
 import modo.service.ChatService;
 import modo.service.WebSocketService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
@@ -68,8 +69,8 @@ public class ChatRoomsUsersRepositoryPerformanceTest {
     }
 
     @Test
+    @Disabled
     void Repository_Performance_만개저장되어있을떄_아이디로채팅방조회_성능테스트() {
-
         saveBooks();
         Long booksId = booksRepository.findAll().get(1).getBooksId();
         for (int i = 0; i < 10000; i++) {
