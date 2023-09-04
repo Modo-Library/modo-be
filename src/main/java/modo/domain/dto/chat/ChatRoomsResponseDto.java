@@ -8,7 +8,6 @@ import modo.domain.entity.ChatRooms;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Builder
@@ -20,12 +19,10 @@ public class ChatRoomsResponseDto {
     private String imgUrl;
 
     @Builder
-    public ChatRoomsResponseDto(ChatRooms chatRooms) {
+    public ChatRoomsResponseDto(ChatRooms chatRooms, List<String> usersIdList) {
         this.chatRoomsId = chatRooms.getChatRoomsId();
         this.timeStamp = chatRooms.getTimeStamp();
         this.imgUrl = chatRooms.getImgUrl();
-        this.usersIdList = chatRooms.getUsersList().stream()
-                .map(each -> each.getUsersId())
-                .collect(Collectors.toList());
+        this.usersIdList = usersIdList;
     }
 }

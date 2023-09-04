@@ -67,6 +67,16 @@ public class WebSocketServiceTest {
         saveBooks();
     }
 
+    @BeforeEach
+    void tearDown() {
+        chatRoomsUsersRepository.deleteAllInBatch();
+        chatMessagesRepository.deleteAllInBatch();
+        chatRoomsRepository.deleteAllInBatch();
+        booksRepository.deleteAllInBatch();
+        usersHistoryRepository.deleteAllInBatch();
+        usersRepository.deleteAllInBatch();
+    }
+
     @Test
     void WebSocketService_sendMessage_캐시테스트() throws InterruptedException {
         Long booksId = booksRepository.findAll().get(0).getBooksId();
@@ -92,6 +102,8 @@ public class WebSocketServiceTest {
         assertThat(chatRoomsRepository.findAll().size()).isEqualTo(1);
         assertThat(chatMessagesRepository.findAll().size()).isEqualTo(3);
         Long targetChatRoomsId = chatRoomsRepository.findAll().get(0).getChatRoomsId();
+        assertThat(chatRoomsUsersRepository.findAll().get(0).getSenderId()).isEqualTo(StaticResources.senderId);
+        assertThat(chatRoomsUsersRepository.findAll().get(0).getReceiverId()).isEqualTo(StaticResources.receiverId);
         assertThat(chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(targetChatRoomsId).get().getChatMessagesList().size()).isEqualTo(3);
         assertThat(chatRoomsRepository.findAll().get(0).getTimeStamp()).isAfter(LocalDateTime.parse(messages.getTimeStamp()));
     }
@@ -118,6 +130,7 @@ public class WebSocketServiceTest {
 
         // Send second messages for books2
         // Another chatRooms will be created
+        saveBooks();
         booksId = booksRepository.findAll().get(1).getBooksId();
         messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString(), StaticResources.testMessages);
         webSocketService.sendMessages(messages);
@@ -137,7 +150,7 @@ public class WebSocketServiceTest {
         assertThat(chatRoomsResponseDtoListForSender.get(0).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(chatRoomsResponseDtoListForSender.get(1).getUsersIdList().size()).isEqualTo(2);
         assertThat(chatRoomsResponseDtoListForSender.get(1).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(chatRoomsResponseDtoListForSender.get(0).getTimeStamp()).isAfter(chatRoomsResponseDtoListForSender.get(1).getTimeStamp());
+        assertThat(chatRoomsResponseDtoListForSender.get(1).getTimeStamp()).isAfter(chatRoomsResponseDtoListForSender.get(0).getTimeStamp());
 
         List<ChatRoomsResponseDto> chatRoomsResponseDtoListForReceiver = chatService.findChatRoomsList(accessTokenForReceiver);
         assertThat(chatRoomsResponseDtoListForReceiver.size()).isEqualTo(2);
@@ -145,7 +158,7 @@ public class WebSocketServiceTest {
         assertThat(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(chatRoomsResponseDtoListForReceiver.get(1).getUsersIdList().size()).isEqualTo(2);
         assertThat(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
-        assertThat(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp()).isAfter(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp());
+        assertThat(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp()).isAfter(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp());
     }
 
     private void saveSender() {

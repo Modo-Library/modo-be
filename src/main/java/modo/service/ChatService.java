@@ -44,10 +44,10 @@ public class ChatService {
 
     @Transactional
     public ChatRooms saveChatRooms(ChatSendingMessages messages) {
-        Users sender = usersRepository.findUsersByIdFetchChatRoomsList(messages.getSender())
+        Users sender = usersRepository.findById(messages.getSender())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find sender : " + messages.getSender()));
 
-        Users receiver = usersRepository.findUsersByIdFetchChatRoomsList(messages.getReceiver())
+        Users receiver = usersRepository.findById(messages.getReceiver())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot find receiver : " + messages.getReceiver()));
 
         Books books = booksRepository.findById(messages.getBooksId())
@@ -58,11 +58,7 @@ public class ChatService {
         ChatRooms chatRooms = ChatRooms.builder()
                 .imgUrl(imgUrl)
                 .timeStamp(LocalDateTime.parse(messages.getTimeStamp()))
-                .usersList(List.of(sender, receiver))
                 .build();
-
-        sender.addChatRooms(chatRooms);
-        receiver.addChatRooms(chatRooms);
 
         chatRooms = chatRoomsRepository.save(chatRooms);
 
@@ -81,10 +77,18 @@ public class ChatService {
     @Transactional(readOnly = true)
     public List<ChatRoomsResponseDto> findChatRoomsList(String token) {
         String usersId = jwtTokenProvider.getUsersId(token);
-        List<ChatRooms> chatRoomsList = chatRoomsRepository.findChatRoomsWhereUsersBelongsTo(usersId);
-        return chatRoomsList.stream()
-                .map(each -> new ChatRoomsResponseDto(each))
-                .collect(Collectors.toList());
 
+        List<ChatRooms> chatRoomsList =
+                chatRoomsUsersRepository.findChatRoomsByUsersId(usersId);
+
+        return chatRoomsList.stream()
+                .map(each -> {
+                    List<String> usersIdList = List.of(
+                            chatRoomsUsersRepository.findUsersIdListByChatRoomsId(each.getChatRoomsId())
+                                    .split(",")
+                    );
+                    return new ChatRoomsResponseDto(each, usersIdList);
+                })
+                .collect(Collectors.toList());
     }
 }
