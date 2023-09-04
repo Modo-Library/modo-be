@@ -72,6 +72,9 @@ public class WebSocketIntegrationTest {
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
+    @Autowired
+    private PicturesRepository picturesRepository;
+
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
@@ -99,6 +102,7 @@ public class WebSocketIntegrationTest {
         chatRoomsUsersRepository.deleteAllInBatch();
         chatMessagesRepository.deleteAllInBatch();
         chatRoomsRepository.deleteAllInBatch();
+        picturesRepository.deleteAllInBatch();
         booksRepository.deleteAllInBatch();
         usersHistoryRepository.deleteAllInBatch();
         usersRepository.deleteAllInBatch();
