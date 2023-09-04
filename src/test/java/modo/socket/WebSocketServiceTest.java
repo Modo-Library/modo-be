@@ -2,11 +2,10 @@ package modo.socket;
 
 import lombok.extern.log4j.Log4j2;
 import modo.StaticResources;
+import modo.auth.JwtTokenProvider;
+import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
-import modo.repository.BooksRepository;
-import modo.repository.ChatMessagesRepository;
-import modo.repository.ChatRoomsRepository;
-import modo.repository.UsersRepository;
+import modo.repository.*;
 import modo.service.ChatService;
 import modo.service.WebSocketService;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,6 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -50,6 +50,15 @@ public class WebSocketServiceTest {
 
     @Autowired
     UsersRepository usersRepository;
+
+    @Autowired
+    UsersHistoryRepository usersHistoryRepository;
+
+    @Autowired
+    ChatRoomsUsersRepository chatRoomsUsersRepository;
+
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void saveTestSenderAndReceiverAndBook() {
@@ -95,6 +104,48 @@ public class WebSocketServiceTest {
 
         webSocketService.sendMessages(messages);
         assertThrows(RuntimeException.class, () -> chatService.findChatRooms(reverseMessages));
+    }
+
+    @Test
+    void ChatService_findChatRoomsList_테스트() throws InterruptedException {
+        // Send first messages for books1
+        // ChatRooms will be created
+        Long booksId = booksRepository.findAll().get(0).getBooksId();
+        ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString(), StaticResources.testMessages);
+        webSocketService.sendMessages(messages);
+
+        Thread.sleep(1000);
+
+        // Send second messages for books2
+        // Another chatRooms will be created
+        booksId = booksRepository.findAll().get(1).getBooksId();
+        messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString(), StaticResources.testMessages);
+        webSocketService.sendMessages(messages);
+
+        // Create new accessToken
+        String accessTokenForSender = jwtTokenProvider.createAccessToken(StaticResources.senderId);
+        String accessTokenForReceiver = jwtTokenProvider.createAccessToken(StaticResources.receiverId);
+
+        long start = System.currentTimeMillis();
+        // Then, there should be two chatRooms for sender and receiver
+        List<ChatRoomsResponseDto> chatRoomsResponseDtoListForSender = chatService.findChatRoomsList(accessTokenForSender);
+        long finish = System.currentTimeMillis();
+        log.info("Execution Time : {}", finish - start);
+
+        assertThat(chatRoomsResponseDtoListForSender.size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForSender.get(0).getUsersIdList().size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForSender.get(0).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(chatRoomsResponseDtoListForSender.get(1).getUsersIdList().size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForSender.get(1).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(chatRoomsResponseDtoListForSender.get(0).getTimeStamp()).isAfter(chatRoomsResponseDtoListForSender.get(1).getTimeStamp());
+
+        List<ChatRoomsResponseDto> chatRoomsResponseDtoListForReceiver = chatService.findChatRoomsList(accessTokenForReceiver);
+        assertThat(chatRoomsResponseDtoListForReceiver.size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForReceiver.get(0).getUsersIdList().size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(chatRoomsResponseDtoListForReceiver.get(1).getUsersIdList().size()).isEqualTo(2);
+        assertThat(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertThat(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp()).isAfter(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp());
     }
 
     private void saveSender() {

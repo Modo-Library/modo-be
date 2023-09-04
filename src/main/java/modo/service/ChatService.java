@@ -2,6 +2,8 @@ package modo.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import modo.auth.JwtTokenProvider;
+import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
 import modo.domain.entity.Books;
 import modo.domain.entity.ChatRooms;
@@ -16,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -27,6 +30,7 @@ public class ChatService {
     private final BooksRepository booksRepository;
     private final UsersRepository usersRepository;
     private final ChatRoomsUsersRepository chatRoomsUsersRepository;
+    private final JwtTokenProvider jwtTokenProvider;
 
     @Cacheable(value = "ChatRooms", key = "'BooksId' + #messages.getBooksId() + 'Sender'+ #messages.getSender() + 'Receiver'+ #messages.getReceiver()")
     public ChatRooms findChatRooms(ChatSendingMessages messages) {
@@ -72,5 +76,15 @@ public class ChatService {
         chatRoomsUsersRepository.save(chatRoomsUsers);
 
         return chatRooms;
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatRoomsResponseDto> findChatRoomsList(String token) {
+        String usersId = jwtTokenProvider.getUsersId(token);
+        List<ChatRooms> chatRoomsList = chatRoomsRepository.findChatRoomsWhereUsersBelongsTo(usersId);
+        return chatRoomsList.stream()
+                .map(each -> new ChatRoomsResponseDto(each))
+                .collect(Collectors.toList());
+
     }
 }
