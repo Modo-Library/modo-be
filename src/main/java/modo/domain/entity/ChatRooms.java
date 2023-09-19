@@ -27,10 +27,6 @@ public class ChatRooms {
     @Column(nullable = false)
     private LocalDateTime timeStamp;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinColumn(name = "USERS_CHATROOMS")
-    private List<Users> usersList = new ArrayList<>();
-
     @Builder.Default
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "chatRooms")
     private List<ChatMessages> chatMessagesList = new ArrayList<>();

@@ -1,4 +1,4 @@
-package modo.Pictures;
+package modo.pictures;
 
 import modo.repository.BooksRepository;
 import modo.repository.PicturesRepository;

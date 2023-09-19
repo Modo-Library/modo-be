@@ -1,0 +1,13 @@
+= Modo BE API Docs
+Powered By Dongwhwan Lee, https://github.com/hwanld
+:doctype: book
+:icons: font
+:source-highlighter: highlightjs
+:toc: left
+:toclevels: 1
+:sectlinks:
+
+[[Chat-findChatRoomsList]]
+== Chat-findChatRoomsList
+
+operation::Chat-findChatRoomsList[snippets='http-request,request-headers,http-response,response-fields']

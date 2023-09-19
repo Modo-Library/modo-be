@@ -33,6 +33,20 @@ public class StaticResources {
             .longitude(receiverLongitude)
             .build();
 
+    public static final UsersSaveRequestDto thirdUsersSaveRequestDto = UsersSaveRequestDto.builder()
+            .usersId("thirdUsers")
+            .nickname("thirdUsers")
+            .latitude(receiverLatitude)
+            .longitude(receiverLongitude)
+            .build();
+
+    public static final UsersSaveRequestDto fourthUsersSaveRequestDto = UsersSaveRequestDto.builder()
+            .usersId("fourthUsers")
+            .nickname("fourthUsers")
+            .latitude(receiverLatitude)
+            .longitude(receiverLongitude)
+            .build();
+
     public static final String testName = "스프링으로 하는 마이크로서비스 구축";
     public static final Long testPrice = 40000L;
     public static final BooksStatus testStatus = BooksStatus.AVAILABLE_RENT;

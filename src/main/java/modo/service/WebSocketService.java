@@ -6,10 +6,7 @@ import modo.domain.dto.chat.ChatSendingMessages;
 import modo.domain.entity.ChatMessages;
 import modo.domain.entity.ChatRooms;
 import modo.exception.chatException.ChatRoomsNotExistException;
-import modo.repository.BooksRepository;
-import modo.repository.ChatMessagesRepository;
-import modo.repository.ChatRoomsRepository;
-import modo.repository.UsersRepository;
+import modo.repository.*;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +23,7 @@ public class WebSocketService {
     private final BooksRepository booksRepository;
 
     private final UsersRepository usersRepository;
+    private final ChatRoomsUsersRepository chatRoomsUsersRepository;
     private final ChatService chatService;
 
     public void sendMessages(ChatSendingMessages messages) {
@@ -39,7 +37,11 @@ public class WebSocketService {
         // 메세지 저장
         saveMessages(messages, chatRooms);
         // 채팅방 내부 사용자 아이디 조회
-        List<String> usersIdList = chatRoomsRepository.findUsersIdListByChatRoomsId(chatRooms.getChatRoomsId());
+        List<String> usersIdList = List.of(
+                chatRoomsUsersRepository.findUsersIdListByChatRoomsId(chatRooms.getChatRoomsId())
+                        .split(",")
+        );
+
         // 소켓으로 메세지 전송
         usersIdList.stream()
                 .forEach((String each) -> {
