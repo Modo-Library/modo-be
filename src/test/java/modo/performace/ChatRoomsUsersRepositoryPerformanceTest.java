@@ -15,8 +15,6 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.time.LocalDateTime;
-
 @Log4j2
 @SpringBootTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
@@ -74,12 +72,12 @@ public class ChatRoomsUsersRepositoryPerformanceTest {
         saveBooks();
         Long booksId = booksRepository.findAll().get(1).getBooksId();
         for (int i = 0; i < 10000; i++) {
-            ChatSendingMessages messages = new ChatSendingMessages(booksId, "thirdUsers", "fourthUsers", LocalDateTime.now().toString(), StaticResources.testMessages);
+            ChatSendingMessages messages = new ChatSendingMessages(booksId, "thirdUsers", "fourthUsers", StaticResources.testMessages);
             webSocketService.sendMessages(messages);
         }
 
         booksId = booksRepository.findAll().get(0).getBooksId();
-        ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString(), StaticResources.testMessages);
+        ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, StaticResources.testMessages);
         webSocketService.sendMessages(messages);
 
         long start = System.currentTimeMillis();

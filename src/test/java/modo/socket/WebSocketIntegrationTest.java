@@ -25,8 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-import java.time.LocalDateTime;
-
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -111,7 +109,7 @@ public class WebSocketIntegrationTest {
     @Test
     void Integration_findChatRoomsList_테스트() throws Exception {
         Long booksId = booksRepository.findAll().get(0).getBooksId();
-        ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, LocalDateTime.now().toString(), StaticResources.testMessages);
+        ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, StaticResources.testMessages);
         webSocketService.sendMessages(messages);
 
         mockMvc.perform(get("/api/v1/findChatRoomsList")

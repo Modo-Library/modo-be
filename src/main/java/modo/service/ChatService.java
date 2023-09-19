@@ -57,7 +57,7 @@ public class ChatService {
 
         ChatRooms chatRooms = ChatRooms.builder()
                 .imgUrl(imgUrl)
-                .timeStamp(LocalDateTime.parse(messages.getTimeStamp()))
+                .timeStamp(LocalDateTime.now())
                 .build();
 
         chatRooms = chatRoomsRepository.save(chatRooms);

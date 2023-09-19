@@ -15,15 +15,14 @@ public class ChatSendingMessages {
     private Long booksId;
     private String sender;
     private String receiver;
-    private String timeStamp;
     private String content;
 
     public ChatMessages toEntity() {
         return ChatMessages.builder()
                 .sender(sender)
                 .receiver(receiver)
-                .timeStamp(LocalDateTime.parse(timeStamp))
                 .content(content)
+                .timeStamp(LocalDateTime.now())
                 .build();
     }
 
@@ -35,13 +34,12 @@ public class ChatSendingMessages {
         return Objects.equals(booksId, that.booksId) &&
                 Objects.equals(sender, that.sender) &&
                 Objects.equals(receiver, that.receiver) &&
-                Objects.equals(timeStamp, that.timeStamp) &&
                 Objects.equals(content, that.content);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(booksId, sender, receiver, timeStamp, content);
+        return Objects.hash(booksId, sender, receiver, content);
     }
 
 
