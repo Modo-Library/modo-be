@@ -5,10 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
 import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
-import modo.domain.entity.Books;
-import modo.domain.entity.ChatRooms;
-import modo.domain.entity.ChatRoomsUsers;
-import modo.domain.entity.Users;
+import modo.domain.entity.*;
 import modo.exception.chatException.ChatRoomsNotExistException;
 import modo.repository.*;
 import org.springframework.cache.annotation.Cacheable;
@@ -37,6 +34,10 @@ public class ChatService {
 
         Long chatRoomsId = chatRoomsUsersRepository.findChatRoomsUsersIdBySenderIdAndReceiverIdAAndBooksId(messages.getSender(), messages.getReceiver(), messages.getBooksId())
                 .orElseThrow(() -> new ChatRoomsNotExistException());
+
+        // TODO : ChatRoomsUsers의 Sender, Receiver과 ChatSendingMessages의 Sender, Receiver 로직을 정리해야함
+        // orElse로 다시 sender와 receiver의 위치를 바꿔서 charRoomsUsersRepository의 함수를 호출한다.
+        // 그럼에도 불구하고 없을때는 Exception을 Raise한다.
 
         return chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(chatRoomsId)
                 .orElseThrow(() -> new IllegalArgumentException());
@@ -90,5 +91,13 @@ public class ChatService {
                     return new ChatRoomsResponseDto(each, usersIdList);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatMessages> findChatMessagesList(Long chatRoomsId) {
+        ChatRooms chatRooms = chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(chatRoomsId)
+                .orElseThrow(() -> new IllegalArgumentException("ChatRooms with id : " + chatRoomsId + " is not exist!"));
+
+        return chatRooms.getChatMessagesList();
     }
 }
