@@ -10,6 +10,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Log4j2
 @Controller
@@ -28,5 +29,10 @@ public class WebSocketController extends BaseController {
     @GetMapping("api/v1/findChatRoomsList")
     public ResponseEntity<?> findChatRoomsList(@RequestHeader("token") String accessToken) {
         return sendResponse(chatService.findChatRoomsList(accessToken));
+    }
+
+    @GetMapping("api/v1/findChatMessagesList")
+    public ResponseEntity<?> findChatMessagesList(@RequestParam Long chatRoomsId) throws Exception {
+        return sendResponse(chatService.findChatMessagesList(chatRoomsId));
     }
 }
