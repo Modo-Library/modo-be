@@ -3,6 +3,7 @@ package modo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.chat.ChatMessagesResponseDto;
 import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
 import modo.domain.entity.Books;
@@ -17,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,6 +40,10 @@ public class ChatService {
 
         Long chatRoomsId = chatRoomsUsersRepository.findChatRoomsUsersIdBySenderIdAndReceiverIdAAndBooksId(messages.getSender(), messages.getReceiver(), messages.getBooksId())
                 .orElseThrow(() -> new ChatRoomsNotExistException());
+
+        // TODO : ChatRoomsUsers의 Sender, Receiver과 ChatSendingMessages의 Sender, Receiver 로직을 정리해야함
+        // orElse로 다시 sender와 receiver의 위치를 바꿔서 charRoomsUsersRepository의 함수를 호출한다.
+        // 그럼에도 불구하고 없을때는 Exception을 Raise한다.
 
         return chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(chatRoomsId)
                 .orElseThrow(() -> new IllegalArgumentException());
@@ -90,5 +97,21 @@ public class ChatService {
                     return new ChatRoomsResponseDto(each, usersIdList);
                 })
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<ChatMessagesResponseDto> findChatMessagesList(Long chatRoomsId) {
+        ChatRooms chatRooms = chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(chatRoomsId)
+                .orElseThrow(() -> new IllegalArgumentException("ChatRooms with id : " + chatRoomsId + " is not exist!"));
+
+        List chatMessagesResponseDtoList = chatRooms.getChatMessagesList().stream()
+                .map(ChatMessagesResponseDto::new)
+                .collect(Collectors.toList());
+
+        Comparator<ChatMessagesResponseDto> comparator = Comparator.comparing(ChatMessagesResponseDto::getTimeStamp).reversed();
+
+        Collections.sort(chatMessagesResponseDtoList, comparator);
+
+        return chatMessagesResponseDtoList;
     }
 }

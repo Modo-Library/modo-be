@@ -11,3 +11,8 @@ Powered By Dongwhwan Lee, https://github.com/hwanld
 == Chat-findChatRoomsList
 
 operation::Chat-findChatRoomsList[snippets='http-request,request-headers,http-response,response-fields']
+
+[[Chat-findChatMessagesList]]
+== Chat-findChatMessagesList
+
+operation::Chat-findChatMessagesList[snippets='http-request,request-headers,query-parameters,http-response,response-fields']

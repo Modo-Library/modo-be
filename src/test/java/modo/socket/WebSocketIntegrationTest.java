@@ -31,6 +31,8 @@ import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.docu
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.queryParameters;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -128,6 +130,41 @@ public class WebSocketIntegrationTest {
                                 fieldWithPath("[].usersIdList").description("Each ChatRooms usersIdList").type(JsonFieldType.ARRAY),
                                 fieldWithPath("[].imgUrl").description("Each ChatRooms timeStamp").type(JsonFieldType.STRING),
                                 fieldWithPath("[].timeStamp").description("Each ChatRooms imgUrl").type(JsonFieldType.STRING)
+                        )))
+                .andDo(print());
+    }
+
+    @Test
+    void Integration_findChatMessagesList_테스트() throws Exception {
+        Long booksId = booksRepository.findAll().get(0).getBooksId();
+        // Send 10 Messages
+        for (int i = 0; i < 10; i++) {
+            ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, "This is " + i + " messages");
+            webSocketService.sendMessages(messages);
+        }
+        // Get ChatRoomsId
+        Long chatRoomsId = chatRoomsRepository.findAll().get(0).getChatRoomsId();
+
+        mockMvc.perform(get("/api/v1/findChatMessagesList")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("token", accessToken)
+                        .queryParam("chatRoomsId", String.valueOf(chatRoomsId))
+                )
+                .andExpect(status().isOk())
+                .andDo(document("Chat-findChatMessagesList",
+                        Preprocessors.preprocessRequest(Preprocessors.prettyPrint()),
+                        Preprocessors.preprocessResponse(Preprocessors.prettyPrint()),
+                        requestHeaders(
+                                headerWithName("token").description("Wrong access Token value")
+                        ),
+                        queryParameters(
+                                parameterWithName("chatRoomsId").description("ChatRoomsId for search")
+                        ),
+                        responseFields(
+                                fieldWithPath("[].sender").description("Messages Sender").type(JsonFieldType.STRING),
+                                fieldWithPath("[].receiver").description("Messages Receiver").type(JsonFieldType.STRING),
+                                fieldWithPath("[].content").description("Messages Content").type(JsonFieldType.STRING),
+                                fieldWithPath("[].timeStamp").description("Messages Timestamp").type(JsonFieldType.STRING)
                         )))
                 .andDo(print());
     }

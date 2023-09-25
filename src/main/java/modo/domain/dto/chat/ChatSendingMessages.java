@@ -1,6 +1,7 @@
 package modo.domain.dto.chat;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import modo.domain.entity.ChatMessages;
@@ -10,6 +11,7 @@ import java.util.Objects;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 @Getter
 public class ChatSendingMessages {
     private Long booksId;
