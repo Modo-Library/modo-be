@@ -3,6 +3,7 @@ package modo.socket;
 import lombok.extern.log4j.Log4j2;
 import modo.StaticResources;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.chat.ChatMessagesResponseDto;
 import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
 import modo.repository.*;
@@ -160,6 +161,30 @@ public class WebSocketServiceTest {
         assertThat(chatRoomsResponseDtoListForReceiver.get(1).getUsersIdList().size()).isEqualTo(2);
         assertThat(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp()).isBeforeOrEqualTo(LocalDateTime.now());
         assertThat(chatRoomsResponseDtoListForReceiver.get(1).getTimeStamp()).isAfter(chatRoomsResponseDtoListForReceiver.get(0).getTimeStamp());
+    }
+
+    @Test
+    void ChatService_findChatMessagesList_테스트() throws Exception {
+        // given
+        // Get BooksId
+        Long booksId = booksRepository.findAll().get(0).getBooksId();
+        // Send 10 Messages
+        for (int i = 0; i < 10; i++) {
+            ChatSendingMessages messages = new ChatSendingMessages(booksId, StaticResources.senderId, StaticResources.receiverId, "This is " + i + " messages");
+            webSocketService.sendMessages(messages);
+        }
+        // Get ChatRoomsId
+        Long chatRoomsId = chatRoomsRepository.findAll().get(0).getChatRoomsId();
+
+        // when
+        List<ChatMessagesResponseDto> result = chatService.findChatMessagesList(chatRoomsId);
+
+        // then
+        // Check List<ChatMessagesResponseDto> is sorted, with correct size and content
+        assertThat(result.size()).isEqualTo(10);
+        assertThat(result.get(0).getTimeStamp()).isAfter(result.get(9).getTimeStamp());
+        assertThat(result.get(0).getContent()).isEqualTo("This is 9 messages");
+
     }
 
     private void saveSender() {

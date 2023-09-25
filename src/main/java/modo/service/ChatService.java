@@ -3,9 +3,13 @@ package modo.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import modo.auth.JwtTokenProvider;
+import modo.domain.dto.chat.ChatMessagesResponseDto;
 import modo.domain.dto.chat.ChatRoomsResponseDto;
 import modo.domain.dto.chat.ChatSendingMessages;
-import modo.domain.entity.*;
+import modo.domain.entity.Books;
+import modo.domain.entity.ChatRooms;
+import modo.domain.entity.ChatRoomsUsers;
+import modo.domain.entity.Users;
 import modo.exception.chatException.ChatRoomsNotExistException;
 import modo.repository.*;
 import org.springframework.cache.annotation.Cacheable;
@@ -14,6 +18,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,10 +100,18 @@ public class ChatService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChatMessages> findChatMessagesList(Long chatRoomsId) {
+    public List<ChatMessagesResponseDto> findChatMessagesList(Long chatRoomsId) {
         ChatRooms chatRooms = chatRoomsRepository.findChatRoomsByIdFetchChatMessagesList(chatRoomsId)
                 .orElseThrow(() -> new IllegalArgumentException("ChatRooms with id : " + chatRoomsId + " is not exist!"));
 
-        return chatRooms.getChatMessagesList();
+        List chatMessagesResponseDtoList = chatRooms.getChatMessagesList().stream()
+                .map(ChatMessagesResponseDto::new)
+                .collect(Collectors.toList());
+
+        Comparator<ChatMessagesResponseDto> comparator = Comparator.comparing(ChatMessagesResponseDto::getTimeStamp).reversed();
+
+        Collections.sort(chatMessagesResponseDtoList, comparator);
+
+        return chatMessagesResponseDtoList;
     }
 }
